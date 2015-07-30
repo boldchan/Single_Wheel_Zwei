@@ -1,17 +1,19 @@
 ﻿#ifndef STEPMOTOR_H_
 #define STEPMOTOR_H_
 
+
+
 /*	步进电机1	*/
-#define SMotor1_A SIU.GPDO[28].B.PDO	//PB12
-#define SMotor1_B SIU.GPDO[29].B.PDO	//PB13
-#define SMotor1_C SIU.GPDO[30].B.PDO	//PB14
-#define SMotor1_D SIU.GPDO[31].B.PDO	//PB15
+#define SMotor1_A SIU.GPDO[6].B.PDO		//PA6
+#define SMotor1_B SIU.GPDO[7].B.PDO		//PA7
+#define SMotor1_C SIU.GPDO[8].B.PDO		//PA8
+#define SMotor1_D SIU.GPDO[9].B.PDO		//PA9
 
 /*	步进电机2	*/
-#define SMotor2_A SIU.GPDO[6].B.PDO		//PA6
-#define SMotor2_B SIU.GPDO[7].B.PDO		//PA7
-#define SMotor2_C SIU.GPDO[8].B.PDO		//PA8
-#define SMotor2_D SIU.GPDO[9].B.PDO		//PA9
+#define SMotor2_A SIU.GPDO[28].B.PDO	//PB12
+#define SMotor2_B SIU.GPDO[29].B.PDO	//PB13
+#define SMotor2_C SIU.GPDO[30].B.PDO	//PB14
+#define SMotor2_D SIU.GPDO[31].B.PDO	//PB15
 
 extern BYTE g_Control;
 extern int stepspeed;

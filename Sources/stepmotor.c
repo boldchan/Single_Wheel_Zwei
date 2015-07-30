@@ -185,11 +185,13 @@ void stepmotor_balance(void)
 /*-----------------------------------------------------------------------*/
 void init_Stepmotor(void)
 {
-	/* 步进电机1 */
+#if 0
+	/* 步进电机1与舵机冲突 如需要则另外分配口 */
 	SIU.PCR[6].R = 0x0203;	/* A相 PA6 */
   	SIU.PCR[7].R = 0x0203; 	/* B相 PA7 */
  	SIU.PCR[8].R = 0x0203; 	/* C相 PA8 */
 	SIU.PCR[9].R = 0x0203;	/* D相 PA9 */
+#endif
 	/* 步进电机2 */
 	SIU.PCR[28].R = 0x0203;	/* A相 PB12 */
   	SIU.PCR[29].R = 0x0203; /* B相 PB13 */
@@ -200,37 +202,37 @@ void init_Stepmotor(void)
 }
 void Motor_stop(void)
 {
-	SMotor1_A=1;
-	SMotor1_B=1;
-	SMotor1_C=1;
-	SMotor1_D=1;
+	SMotor2_A=1;
+	SMotor2_B=1;
+	SMotor2_C=1;
+	SMotor2_D=1;
 }
 void Motor_A(void)
 {
-	SMotor1_A=0;
-	SMotor1_B=1;
-	SMotor1_C=1;
-	SMotor1_D=1;
+	SMotor2_A=0;
+	SMotor2_B=1;
+	SMotor2_C=1;
+	SMotor2_D=1;
 }
 void Motor_B(void)
 {
-	SMotor1_A=1;
-	SMotor1_B=0;
-	SMotor1_C=1;
-	SMotor1_D=1;
+	SMotor2_A=1;
+	SMotor2_B=0;
+	SMotor2_C=1;
+	SMotor2_D=1;
 }
 void Motor_C(void)
 {
-	SMotor1_A=1;
-	SMotor1_B=1;
-	SMotor1_C=0;
-	SMotor1_D=1;
+	SMotor2_A=1;
+	SMotor2_B=1;
+	SMotor2_C=0;
+	SMotor2_D=1;
 }
 void Motor_D(void)
 {
-	SMotor1_A=1;
-	SMotor1_B=1;
-	SMotor1_C=1;
-	SMotor1_D=0;
+	SMotor2_A=1;
+	SMotor2_B=1;
+	SMotor2_C=1;
+	SMotor2_D=0;
 }
 

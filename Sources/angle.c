@@ -21,10 +21,10 @@ void angle_read(unsigned int *AngleGra)
 		temp[0]+=jos[0];//PB10
 		jos[1]=(unsigned int)ADC.CDR[35].B.CDATA;
 		temp[1]+=jos[1];//PB11
-		jos[2]=(unsigned int)ADC.CDR[37].B.CDATA;
-		temp[2]+=jos[2];//PD13
-		jos[3]=(unsigned int)ADC.CDR[39].B.CDATA;
-		temp[3]+=jos[3];//PD15
+		jos[2]=(unsigned int)ADC.CDR[36].B.CDATA;
+		temp[2]+=jos[2];//PD12
+		jos[3]=(unsigned int)ADC.CDR[37].B.CDATA;
+		temp[3]+=jos[3];//PD13
 	}
 	ADResult[0]=5000/1024*(temp[0]/20);
 	ADResult[1]=5000/1024*(temp[1]/20);

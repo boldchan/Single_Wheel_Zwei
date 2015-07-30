@@ -174,6 +174,9 @@ extern void set_speed_KD(float kd);
 
 
 extern void BalanceControl(void);
+extern void Balance_Control_HELM(void);
+extern void set_steer_helm_basement(WORD helmData);
+
 
 
 
