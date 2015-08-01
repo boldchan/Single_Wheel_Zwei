@@ -152,7 +152,7 @@ void PITCH_motor_control(void)
 //	motor_pwm_balance=angle_pwm_balance;
 //	set_motor_pwm(angle_pwm_balance);
 //}
-
+#if 0
 /*-----------------------------------------------------------------------*/
 /* 设置平衡电机PWM                                                                    */
 /*-----------------------------------------------------------------------*/
@@ -185,6 +185,7 @@ void set_ROLL_motor_pwm(int16_t motor_pwm)	//speed_pwm正为向前，负为向�
 		EMIOS_0.CH[20].CBDR.R = 1;	
 	}
 }
+#endif
 /*----设置螺旋桨电机A-------*/
 void set_PropellerA_motor_pwm(int16_t motor_pwm)	
 {
@@ -241,6 +242,7 @@ void PropellerB_Control(void)
 	set_PropellerB_motor_pwm(motor_pwm);
 }
 
+#if 0
 /*-----------------------------------------------------------------------*/
 /* 设置转向电机PWM                                                                    */
 /*-----------------------------------------------------------------------*/
@@ -280,32 +282,8 @@ void ROLL_motor_control(void)
 	motor_pwm=ROLL_angle_pwm;
 	set_ROLL_motor_pwm(motor_pwm);
 }
-/*-----------------------------------------------------------------------*/
-/* BangBang速度控制                                                             */
-/*-----------------------------------------------------------------------*/
-void contorl_speed_encoder_bb(void)
-{
-	int32_t tmp_speed_now;
-	
-	
-	if (data_encoder1.is_forward)
-	{
-		tmp_speed_now = data_encoder1.speed_now;
-	}
-	else
-	{
-		tmp_speed_now = 0 - data_encoder1.speed_now;
-	}
-	
-	if (tmp_speed_now > data_speed_settings.speed_target)
-	{
-		set_PITCH_motor_pwm(0 - SPEED_PWM_MAX);
-	}
-	else if (tmp_speed_now < data_speed_settings.speed_target)
-	{
-		set_PITCH_motor_pwm(SPEED_PWM_MAX);
-	}
-}
+#endif
+
 
 /*-----------------------------------------------------------------------*/
 /* 前后角度控制                                                             */
@@ -317,7 +295,7 @@ void AngleControl(void)
    float temp_angle, temp_anglespeed;
    float currentanglespeed, lastanglespeed=0;
    float last_angle=0;
-   angle_calculate();
+   //angle_calculate();
    g_fCarAngle= AngleCalculate[0];
    g_fGyroscopeAngleSpeed= -AngleCalculate[1];
  // g_fGyroscopeTurnSpeed= AngleCalculateResult[2];
@@ -338,24 +316,13 @@ void AngleControl(void)
 //   if(temp_anglespeed>=50||temp_anglespeed<=-50)
 //	   data_angle_pid.d=2;//0.3
 //   else
-//	   data_angle_pid.d=0.5;//0.1
-  
-   currentanglespeed=g_fCarAngle;
-   delta_anglespeed=currentanglespeed-lastanglespeed;
-   lastanglespeed=currentanglespeed;
-  
+//	   data_angle_pid.d=0.5;//0.1 
    delta_angle = data_angle_pid.p*(CarAngleInitial - g_fCarAngle);
-   delta_angle+=data_angle_pid.d*0.6*(CarAnglespeedInitial - g_fGyroscopeAngleSpeed);
-   delta_angle+=data_angle_pid.d*0.4*delta_anglespeed;
+   delta_angle+=data_angle_pid.d*(CarAnglespeedInitial - g_fGyroscopeAngleSpeed);
+
   //delta_angle = data_angle_pid.p*(CarAngleInitial - g_fCarAngle) /5000 +data_angle_pid.d*(CarAnglespeedInitial - g_fGyroscopeAngleSpeed) /15000; // 1000 与10000是否根据实际需要调整 
   //angle_pwm=delta_angle;
-  
- /* if(delta_angle>AngleControlOutMax)
-  delta_angle=AngleControlOutMax;
-  else if(delta_angle<AngleControlOutMin)
-  delta_angle=AngleControlOutMin;*/
-  
-  PITCH_angle_pwm=delta_angle;
+    PITCH_angle_pwm=delta_angle;
   
 }
 
@@ -370,7 +337,7 @@ void BalanceControl(void)
 	static float currentanglespeed_balance, lastanglespeed_balance=0;
 	float last_angle_balance=0;
 	float temp_p,temp_d;
-	angle_calculate();
+	//angle_calculate();
 	g_fCarAngle_balance= AngleCalculate[2];
 	g_fGyroscopeAngleSpeed_balance=-AngleCalculate[3];
 	 
@@ -395,24 +362,13 @@ void BalanceControl(void)
 	//	delta_angle_balance+=data_speed_pid.d*0.4*delta_anglespeed_balance;	  
 	//angle_pwm_balance=dta_angle;
 	ROLL_angle_pwm=delta_angle_balance;
-	LCD_PrintoutInt(0, 6, ROLL_angle_pwm);
+	//LCD_PrintoutInt(0, 6, ROLL_angle_pwm);
 }
 
 
 
 
 
-
-/*-----------------------------------------------------------------------*/
-/* 左右平衡控制[舵机摆臂]     by-JOSTIN                                                        */
-/*-----------------------------------------------------------------------*/
-void Balance_Control_HELM(void)
-{
-	if(AngleCalculate[2]>0)
-		set_steer_helm_basement(6000);
-	else
-		set_steer_helm_basement(1000);
-}
 
 /*-----------------------------------------------------------------------*/
 /* 设置方向舵机位置                                                                */

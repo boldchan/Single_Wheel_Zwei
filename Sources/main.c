@@ -2,7 +2,6 @@
 
 BYTE count=0;
 BYTE  SpeedCountFlag=0;
-//int stepcount=0;
 
 void main(void)
 {
@@ -25,16 +24,14 @@ void main(void)
 		{
 			g_Control=0;
 			count++;
-//			stepcount++;
 			D6=~D6;
 			//步进电机调平衡
-//			angle_read(AngleResult_balance);
-//			stepmotor_balance();
-			
-//			stepmotor_video(stepcount);//视频用步进电机转动
+
+
 			
 			speed_period++;
 			angle_read(AngleResult);
+			angle_calculate();
 #if 1
 			set_speed_pwm();
 			AngleControl();
@@ -109,10 +106,7 @@ void main(void)
 //				send_data2PC(ENC03,GYR_TYPE,dall);
 				count=0;
 			}
-//			if(stepcount==2500)
-//			{
-//				stepcount=0;
-//			}
+
 		}
 #endif
 	}
