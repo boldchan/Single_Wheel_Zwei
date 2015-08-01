@@ -2,7 +2,7 @@
 
 BYTE count=0;
 BYTE  SpeedCountFlag=0;
-int stepcount=0;
+//int stepcount=0;
 
 void main(void)
 {
@@ -25,7 +25,7 @@ void main(void)
 		{
 			g_Control=0;
 			count++;
-			stepcount++;
+//			stepcount++;
 			D6=~D6;
 			//步进电机调平衡
 //			angle_read(AngleResult_balance);
@@ -35,7 +35,7 @@ void main(void)
 			
 			speed_period++;
 			angle_read(AngleResult);
-#if 0
+#if 1
 			set_speed_pwm();
 			AngleControl();
 			BalanceControl();
@@ -51,7 +51,6 @@ void main(void)
 			if(AngleCalculate[0]<20&&AngleCalculate[0]>-20)
 			{ 
 				PITCH_motor_control();
-				set_YAW_motor_pwm(motor_pwm_settings.motor_3_pwm);
 
 			} 
 			else
@@ -63,18 +62,30 @@ void main(void)
 			LCD_PrintoutInt(64, 0, AngleResult[3]);
 			LCD_PrintoutInt(0, 2, angle_data.ROLL_angle_zero);
 			LCD_PrintoutInt(64, 2, angle_data.ROLL_anglespeed_zero);
-			if(count==3)
+			if(AngleCalculate[2]<30&&AngleCalculate[2]>-30)
+			{ 
+				//ROLL_motor_control();
+				PropellerA_Control();
+				PropellerB_Control();
+//				Bangbang_balance_control();
+			} 
+			else
 			{
-				/*	平衡控制	*/ 
-				if(AngleCalculate[2]<20&&AngleCalculate[2]>-20)
-				{ 
-					Balance_Control_HELM();//【大保健看这里：想用上位机调要用WIFI的接收 见For C CUP】
-				} 
-				else
-				{
-					set_steer_helm_basement(3000);
-				}
+				set_PropellerA_motor_pwm(-1);
+				set_PropellerB_motor_pwm(-1);
 			}
+//			if(count==3)
+//			{
+//				/*	平衡控制	*/ 
+//				if(AngleCalculate[2]<20&&AngleCalculate[2]>-20)
+//				{ 
+//					Balance_Control_HELM();//【大保健看这里：想用上位机调要用WIFI的接收 见For C CUP】
+//				} 
+//				else
+//				{
+//					set_steer_helm_basement(3000);
+//				}
+//			}
 
 			if(count==4)
 			{
@@ -98,10 +109,10 @@ void main(void)
 //				send_data2PC(ENC03,GYR_TYPE,dall);
 				count=0;
 			}
-			if(stepcount==2500)
-			{
-				stepcount=0;
-			}
+//			if(stepcount==2500)
+//			{
+//				stepcount=0;
+//			}
 		}
 #endif
 	}

@@ -185,6 +185,62 @@ void set_ROLL_motor_pwm(int16_t motor_pwm)	//speed_pwm正为向前，负为向�
 		EMIOS_0.CH[20].CBDR.R = 1;	
 	}
 }
+/*----设置螺旋桨电机A-------*/
+void set_PropellerA_motor_pwm(int16_t motor_pwm)	
+{
+	//使用PE3 PE4
+	motor_pwm=1000+motor_pwm;
+	if (motor_pwm>0)	
+	{
+		if (motor_pwm>1950)
+		{
+			motor_pwm = 1950;
+		}
+		EMIOS_0.CH[19].CBDR.R = motor_pwm;//PE3
+		EMIOS_0.CH[20].CBDR.R = 1;//PE4
+		
+	}
+	else 	
+	{
+		EMIOS_0.CH[19].CBDR.R = 1;
+		EMIOS_0.CH[20].CBDR.R = 1;	
+	}
+}
+
+/*---设置螺旋桨B电机---*/
+void set_PropellerB_motor_pwm(int16_t motor_pwm)	
+{
+	//暂时使用PE1,PE2
+	motor_pwm=1000-motor_pwm;
+	if (motor_pwm>0)	
+	{
+		if (motor_pwm>1950)
+		{
+			motor_pwm = 1950;
+		}
+		EMIOS_0.CH[17].CBDR.R = motor_pwm;//PE1
+		EMIOS_0.CH[18].CBDR.R = 1;//PE2
+		
+	}
+	else 	
+	{
+		EMIOS_0.CH[17].CBDR.R = 1;
+		EMIOS_0.CH[18].CBDR.R = 1;	
+	}
+}
+void PropellerA_Control(void)
+{
+	int16_t motor_pwm;
+	motor_pwm=ROLL_angle_pwm;
+	set_PropellerA_motor_pwm(motor_pwm);
+}
+void PropellerB_Control(void)
+{
+	int16_t motor_pwm;
+	motor_pwm=ROLL_angle_pwm;
+	set_PropellerB_motor_pwm(motor_pwm);
+}
+
 /*-----------------------------------------------------------------------*/
 /* 设置转向电机PWM                                                                    */
 /*-----------------------------------------------------------------------*/
@@ -308,75 +364,43 @@ void AngleControl(void)
 /*-----------------------------------------------------------------------*/
 void BalanceControl(void)
 {
-	/*
-	//用电位器调节转速，试验用
-	int potential=1;
-	int sss=1;
-	potential=(int)ADC.CDR[33].B.CDATA;//PB9
-	if(potential<0)
-	{
-		potential=0-potential;
-	}
-	if(potential>SPEED_PWM_MAX)
-	{
-		potential=SPEED_PWM_MAX;
-	}
-	
-	if(potential<200)
-		sss=200;
-	else
-		sss=500;
-	set_motor_pwm(100);  
-	*/
-	
 	float delta_angle_balance;
 	float delta_anglespeed_balance;
 	float temp_angle_balance, temp_anglespeed_balance;
-	float currentanglespeed_balance, lastanglespeed_balance=0;
+	static float currentanglespeed_balance, lastanglespeed_balance=0;
 	float last_angle_balance=0;
+	float temp_p,temp_d;
 	angle_calculate();
 	g_fCarAngle_balance= AngleCalculate[2];
-	g_fGyroscopeAngleSpeed_balance= -AngleCalculate[3];
+	g_fGyroscopeAngleSpeed_balance=-AngleCalculate[3];
 	 
 	temp_angle_balance=CarAngleInitial_balance - g_fCarAngle_balance;
 	temp_anglespeed_balance= CarAnglespeedInitial_balance - g_fGyroscopeAngleSpeed_balance;
-	  
-//	   if(temp_angle_balance<-15)
-//		   data_angle_pid.p=100; //100开环
-//	   else if(temp_angle_balance>=-15&temp_angle_balance<=0)
-//		   data_angle_pid.p=200; //200
-//	   else if(temp_angle_balance>0&temp_angle_balance<=15)
-//		   data_angle_pid.p=200;// 170   
-//	   else
-//		   data_angle_pid.p=100;  //100
-//	                                                    
-//	  
-//	   if(temp_anglespeed_balance>=50||temp_anglespeed_balance<=-50)
-//		   data_angle_pid.d=2;//0.3
-//	   else
-//		   data_angle_pid.d=0.5;//0.1
-	  
-	  currentanglespeed_balance=g_fCarAngle_balance;
-	  delta_anglespeed_balance=currentanglespeed_balance-lastanglespeed_balance;
-	  lastanglespeed_balance=currentanglespeed_balance;
-	  
-	  delta_angle_balance = data_angle_pid.p*(CarAngleInitial_balance - g_fCarAngle_balance);
-	  delta_angle_balance+=data_angle_pid.d*0.6*(CarAnglespeedInitial_balance - g_fGyroscopeAngleSpeed_balance);
-	  delta_angle_balance+=data_angle_pid.d*0.4*delta_anglespeed_balance;
-	  //delta_angle = data_angle_pid.p*(CarAngleInitial - g_fCarAngle) /5000 +data_angle_pid.d*(CarAnglespeedInitial - g_fGyroscopeAngleSpeed) /15000; // 1000 与10000是否根据实际需要调整 
-	  //angle_pwm=delta_angle;
-	  
-	  /* if(delta_angle>AngleControlOutMax)
-	  delta_angle=AngleControlOutMax;
-	  else if(delta_angle<AngleControlOutMin)
-	  delta_angle=AngleControlOutMin;*/
-	  
-	  //angle_pwm_balance=dta_angle;
-	  ROLL_angle_pwm=delta_angle_balance;
-	
-	
-	
+	if(g_fCarAngle_balance>7||g_fCarAngle_balance<-7)
+	{
+		temp_d=0;
+		temp_p=90;
+	}
+	else
+	{
+		temp_p=data_ROLL_angle_pid.p;
+		temp_d=data_ROLL_angle_pid.d;
+	}	
+	//	currentanglespeed_balance=g_fCarAngle_balance;
+	//	delta_anglespeed_balance=currentanglespeed_balance-lastanglespeed_balance;
+	//	lastanglespeed_balance=currentanglespeed_balance;
+		  
+	delta_angle_balance = temp_p*(CarAngleInitial_balance - g_fCarAngle_balance);
+	delta_angle_balance+=temp_d*(CarAnglespeedInitial_balance - g_fGyroscopeAngleSpeed_balance);
+	//	delta_angle_balance+=data_speed_pid.d*0.4*delta_anglespeed_balance;	  
+	//angle_pwm_balance=dta_angle;
+	ROLL_angle_pwm=delta_angle_balance;
+	LCD_PrintoutInt(0, 6, ROLL_angle_pwm);
 }
+
+
+
+
 
 
 /*-----------------------------------------------------------------------*/

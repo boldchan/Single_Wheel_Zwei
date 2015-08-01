@@ -119,6 +119,22 @@ extern struct
 } data_angle_pid;
 #endif
 
+/*平衡PID数据*/
+#ifdef __CONTROL_C_
+struct
+{
+	float p;
+	float i;
+	float d;
+} data_ROLL_angle_pid = { 60, 0, 37 };
+#else
+extern struct
+{
+	float p;
+	float i;
+	float d;
+} data_ROLL_angle_pid;
+#endif
 /* 速度设置数据 */
 #ifdef __CONTROL_C_
 struct
@@ -177,8 +193,10 @@ extern void BalanceControl(void);
 extern void Balance_Control_HELM(void);
 extern void set_steer_helm_basement(WORD helmData);
 
-
-
+extern void set_PropellerA_motor_pwm(int16_t motor_pwm);
+extern void set_PropellerB_motor_pwm(int16_t motor_pwm);
+extern void PropellerA_Control(void);
+extern void PropellerB_Control(void);
 
 extern void set_pwm1_target(SWORD speed_pwm);
 extern void set_pwm2_target(SWORD speed_pwm);
