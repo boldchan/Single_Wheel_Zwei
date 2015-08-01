@@ -93,7 +93,7 @@ struct
 	float p;
 	float i;
 	float d;
-} data_speed_pid = {20 , 0, 0 };// 速度10：p=50，速度20：p=45
+} data_speed_pid = {20 , 0, 2 };// 速度10：p=50，速度20：p=45
 #else
 extern struct
 {
@@ -204,6 +204,11 @@ extern void set_pwm3_target(SWORD speed_pwm);
 extern void set_angle_KP(float kp);
 extern void set_angle_KI(float kp);
 extern void set_angle_KD(float kp);
+extern void set_ROLL_KP(float kp);
+extern void set_ROLL_KI(float kp);
+extern void set_ROLL_KD(float kp);
+
+
 
 
 extern DWORD diff_time_basis_PIT(const DWORD new_time, const DWORD old_time);

@@ -82,7 +82,7 @@ void main(void)
 				get_speed_now();
 				if(SpeedCountFlag>=20) 
 				{
-//					set_speed_PID();
+					set_speed_PID();
 					contorl_speed_encoder_pid();
 					speed_period=0;
 //					LCD_PrintoutInt(0, 4, data_speed_pid.p);

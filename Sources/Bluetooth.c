@@ -82,13 +82,13 @@ void execute_remote_cmd(const BYTE *data)
 		break;
 		
 		case CMD_SET_MOTOR1_KP :
-			set_speed_KP(*((SWORD *)(&(data[2]))));
+			set_ROLL_KP(*((SWORD *)(&(data[2]))));
 		break;
 		case CMD_SET_MOTOR1_KI :
-			set_speed_KI(*((SWORD *)(&(data[2]))));
+			set_ROLL_KI(*((SWORD *)(&(data[2]))));
 		break;
 		case CMD_SET_MOTOR1_KD :
-			set_speed_KD(*((SWORD *)(&(data[2]))));
+			set_ROLL_KD(*((SWORD *)(&(data[2]))));
 		break;
 
 		

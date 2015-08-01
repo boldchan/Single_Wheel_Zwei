@@ -498,14 +498,6 @@ void set_pwm3_target(SWORD speed_pwm)
 void set_speed_PID(void) 
 { 
 	
-	data_speed_pid.p=20;//v=10 p=20
-	data_speed_pid.d=0;
-	data_speed_pid.i=0;  
-//	data_speed_pid.p=35;//v=20//<v=10 p=20
-//	data_speed_pid.d=0;
-//	data_speed_pid.i=0;  
-
-#if 0
 	if(data_speed_settings.speed_target==0)
 	{
 		data_speed_pid.p=20;
@@ -518,7 +510,6 @@ void set_speed_PID(void)
 	{
 		data_speed_pid.p=45;
 	}
-#endif
 	/*int speed_target=data_speed_settings.speed_target;
 	int speed_now=data_speed_settings.speed_target_now;
 	if(speed_target==0)//420 
@@ -635,7 +626,31 @@ void set_angle_KD(float kd)
 	data_angle_pid.d = kd;
 }
 
+/*-----------------------------------------------------------------------*/
+/* 设置平衡PID控制P值                                                            */
+/*-----------------------------------------------------------------------*/
+void set_ROLL_KP(float kp)
+{
+	data_ROLL_angle_pid.p = kp;
+}
 
+
+/*-----------------------------------------------------------------------*/
+/* 设置平衡PID控制I值                                                             */
+/*-----------------------------------------------------------------------*/
+void set_ROLL_KI(float ki)
+{
+	data_ROLL_angle_pid.i = ki;
+}
+
+
+/*-----------------------------------------------------------------------*/
+/* 设置平衡PID控制D值                                                            */
+/*-----------------------------------------------------------------------*/
+void set_ROLL_KD(float kd)
+{
+	data_ROLL_angle_pid.d = kd;
+}
 /*-----------------------------------------------------------------------*/
 /* 获取两个周期计数的差值，常用故写成函数                               */
 /*-----------------------------------------------------------------------*/
