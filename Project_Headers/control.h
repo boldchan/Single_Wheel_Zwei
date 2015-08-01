@@ -15,7 +15,7 @@
 
 /* 速度PWM */
 #define SPEED_PWM_MIN (1)
-#define SPEED_PWM_MAX (1000)
+#define SPEED_PWM_MAX (1500)
 #define SPEED_PWM_TEST (20)
 
 /* 速度光编 */
@@ -93,7 +93,7 @@ struct
 	float p;
 	float i;
 	float d;
-} data_speed_pid = {20 , 0, 0 };
+} data_speed_pid = {20 , 0, 0 };// 速度10：p=50，速度20：p=45
 #else
 extern struct
 {
@@ -109,7 +109,7 @@ struct
 	float p;
 	float i;
 	float d;
-} data_angle_pid = { 297, 0, 2 };
+} data_angle_pid = { 422, 0, 2 };
 #else
 extern struct
 {

@@ -18,17 +18,12 @@ void main(void)
 			execute_remote_cmd(remote_frame_data+2);
 			
 			D7=~D7;
-		}
-#if 1		
+		}	
 		if(g_Control)
 		{
 			g_Control=0;
 			count++;
-			D6=~D6;
-			//步进电机调平衡
-
-
-			
+			D6=~D6;	
 			speed_period++;
 			angle_read(AngleResult);
 			angle_calculate();
@@ -39,10 +34,7 @@ void main(void)
 
 			LCD_PrintoutInt(0, 0, AngleResult[0]);
 			LCD_PrintoutInt(64, 0, AngleResult[1]);
-			LCD_PrintoutInt(0, 2, angle_data.PITCH_angle_zero);
-			LCD_PrintoutInt(64, 2, angle_data.PITCH_anglespeed_zero);
-			LCD_PrintoutInt(0, 6, data_angle_pid.p);
-			LCD_PrintoutInt(64, 6, data_angle_pid.d);
+
 
 			/*	前后控制	*/
 			if(AngleCalculate[0]<20&&AngleCalculate[0]>-20)
@@ -55,10 +47,10 @@ void main(void)
 				set_PITCH_motor_pwm(0);
 			}
 #endif
-			LCD_PrintoutInt(0, 0, AngleResult[2]);
-			LCD_PrintoutInt(64, 0, AngleResult[3]);
-			LCD_PrintoutInt(0, 2, angle_data.ROLL_angle_zero);
-			LCD_PrintoutInt(64, 2, angle_data.ROLL_anglespeed_zero);
+//			LCD_PrintoutInt(0, 0, AngleResult[2]);
+//			LCD_PrintoutInt(64, 0, AngleResult[3]);
+//			LCD_PrintoutInt(0, 2, angle_data.ROLL_angle_zero);
+//			LCD_PrintoutInt(64, 2, angle_data.ROLL_anglespeed_zero);
 			if(AngleCalculate[2]<30&&AngleCalculate[2]>-30)
 			{ 
 				//ROLL_motor_control();
@@ -96,7 +88,7 @@ void main(void)
 //					LCD_PrintoutInt(0, 4, data_speed_pid.p);
 //					LCD_PrintoutInt(64, 4, data_speed_pid.d);
 //					LCD_PrintoutInt(0, 4, data_speed_settings.speed_target);
-//					LCD_PrintoutInt(65, 4, data_encoder1.speed_real);
+					LCD_PrintoutInt(65, 4, data_encoder1.speed_real);
 					SpeedCountFlag=0;
 				}
 			}
@@ -108,7 +100,7 @@ void main(void)
 			}
 
 		}
-#endif
+
 	}
 }
 

@@ -427,6 +427,7 @@ void contorl_speed_encoder_pid(void)
 	error_last = error;
 	error = data_speed_settings.speed_target - data_encoder1.speed_real;
 	
+
 	old_speed_pwm = new_speed_pwm;
 	kp=(SWORD)(data_speed_pid.p*(error));       //P控制
 	new_speed_pwm=kp;
@@ -500,10 +501,24 @@ void set_speed_PID(void)
 	data_speed_pid.p=20;//v=10 p=20
 	data_speed_pid.d=0;
 	data_speed_pid.i=0;  
-//	data_speed_pid.p=35;//v=20//v=10 p=20
+//	data_speed_pid.p=35;//v=20//<v=10 p=20
 //	data_speed_pid.d=0;
 //	data_speed_pid.i=0;  
-	return;
+
+#if 0
+	if(data_speed_settings.speed_target==0)
+	{
+		data_speed_pid.p=20;
+	}
+	else if(data_speed_settings.speed_target<10)
+	{
+		data_speed_pid.p=50;
+	}
+	else if(data_speed_settings.speed_target<20)
+	{
+		data_speed_pid.p=45;
+	}
+#endif
 	/*int speed_target=data_speed_settings.speed_target;
 	int speed_now=data_speed_settings.speed_target_now;
 	if(speed_target==0)//420 
