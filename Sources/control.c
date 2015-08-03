@@ -186,17 +186,21 @@ void set_ROLL_motor_pwm(int16_t motor_pwm)	//speed_pwm正为向前，负为向�
 	}
 }
 #endif
-/*----设置螺旋桨电机A-------*/
+/*----设置螺旋桨电机A MOTOR3-------*/
 void set_PropellerA_motor_pwm(int16_t motor_pwm)	
 {
 	//使用PE3 PE4
-	motor_pwm=1000+motor_pwm;
+	motor_pwm=900+motor_pwm;
 	if (motor_pwm>0)	
 	{
-		if (motor_pwm>1950)
+		if (motor_pwm>1800)//最高电压7.2V
 		{
-			motor_pwm = 1950;
+			motor_pwm = 1800;
 		}
+//		else if(motor_pwm<250)//死区电压1V
+//		{
+//			motor_pwm=250;
+//		}
 		EMIOS_0.CH[19].CBDR.R = motor_pwm;//PE3
 		EMIOS_0.CH[20].CBDR.R = 1;//PE4
 		
@@ -208,19 +212,23 @@ void set_PropellerA_motor_pwm(int16_t motor_pwm)
 	}
 }
 
-/*---设置螺旋桨B电机---*/
+/*---设置螺旋桨B电机MOTOR2---*/
 void set_PropellerB_motor_pwm(int16_t motor_pwm)	
 {
 	//暂时使用PE1,PE2
-	motor_pwm=1000-motor_pwm;
+	motor_pwm=900-motor_pwm;
 	if (motor_pwm>0)	
 	{
-		if (motor_pwm>1950)
+		if (motor_pwm>1800)//最高电压7.2V
 		{
-			motor_pwm = 1950;
+			motor_pwm = 1800;
 		}
-		EMIOS_0.CH[17].CBDR.R = motor_pwm;//PE1
-		EMIOS_0.CH[18].CBDR.R = 1;//PE2
+//		else if(motor_pwm<250)//死区电压1V
+//		{
+//			motor_pwm=250;
+//		}
+		EMIOS_0.CH[18].CBDR.R = motor_pwm;//PE1
+		EMIOS_0.CH[17].CBDR.R = 1;//PE2
 		
 	}
 	else 	
@@ -346,7 +354,7 @@ void BalanceControl(void)
 	if(g_fCarAngle_balance>7||g_fCarAngle_balance<-7)
 	{
 		temp_d=0;
-		temp_p=90;
+		temp_p=400;
 	}
 	else
 	{
@@ -362,7 +370,7 @@ void BalanceControl(void)
 	//	delta_angle_balance+=data_speed_pid.d*0.4*delta_anglespeed_balance;	  
 	//angle_pwm_balance=dta_angle;
 	ROLL_angle_pwm=delta_angle_balance;
-	//LCD_PrintoutInt(0, 6, ROLL_angle_pwm);
+	LCD_PrintoutInt(0, 2, ROLL_angle_pwm);
 }
 
 

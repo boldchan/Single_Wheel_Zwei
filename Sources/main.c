@@ -32,9 +32,15 @@ void main(void)
 			AngleControl();
 			BalanceControl();
 
-			LCD_PrintoutInt(0, 0, AngleResult[0]);
-			LCD_PrintoutInt(64, 0, AngleResult[1]);
-
+//			LCD_PrintoutInt(0, 4, AngleResult[0]);
+//			LCD_PrintoutInt(64, 4, AngleResult[1]);
+			LCD_PrintoutInt(0, 0, data_ROLL_angle_pid.p);
+			LCD_PrintoutInt(64, 0, data_ROLL_angle_pid.d);
+//			LCD_PrintoutInt(0, 0, data_speed_pid.p);
+//			LCD_PrintoutInt(64, 0, data_speed_pid.d);
+			LCD_PrintoutInt(0, 6, AngleCalculate[2]);
+			LCD_PrintoutInt(64, 6, AngleCalculate[3]);
+			
 
 			/*	前后控制	*/
 			if(AngleCalculate[0]<20&&AngleCalculate[0]>-20)
@@ -47,11 +53,9 @@ void main(void)
 				set_PITCH_motor_pwm(0);
 			}
 #endif
-//			LCD_PrintoutInt(0, 0, AngleResult[2]);
-//			LCD_PrintoutInt(64, 0, AngleResult[3]);
-//			LCD_PrintoutInt(0, 2, angle_data.ROLL_angle_zero);
-//			LCD_PrintoutInt(64, 2, angle_data.ROLL_anglespeed_zero);
-			if(AngleCalculate[2]<30&&AngleCalculate[2]>-30)
+			LCD_PrintoutInt(0, 4, AngleResult[2]);
+			LCD_PrintoutInt(64, 4, AngleResult[3]);
+			if(AngleCalculate[2]<20&&AngleCalculate[2]>-20)
 			{ 
 				//ROLL_motor_control();
 				PropellerA_Control();
@@ -60,8 +64,8 @@ void main(void)
 			} 
 			else
 			{
-				set_PropellerA_motor_pwm(-1);
-				set_PropellerB_motor_pwm(-1);
+				set_PropellerA_motor_pwm(-2000);
+				set_PropellerB_motor_pwm(2000);
 			}
 //			if(count==3)
 //			{
@@ -88,7 +92,7 @@ void main(void)
 //					LCD_PrintoutInt(0, 4, data_speed_pid.p);
 //					LCD_PrintoutInt(64, 4, data_speed_pid.d);
 //					LCD_PrintoutInt(0, 4, data_speed_settings.speed_target);
-					LCD_PrintoutInt(65, 4, data_encoder1.speed_real);
+//					LCD_PrintoutInt(65, 4, data_encoder1.speed_real);
 					SpeedCountFlag=0;
 				}
 			}
