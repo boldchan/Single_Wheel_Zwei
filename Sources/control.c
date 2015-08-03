@@ -186,7 +186,7 @@ void set_ROLL_motor_pwm(int16_t motor_pwm)	//speed_pwm正为向前，负为向�
 	}
 }
 #endif
-/*----设置螺旋桨电机A MOTOR3-------*/
+/*----设置螺旋桨电机A MOTOR3 黑白线电机-------*/
 void set_PropellerA_motor_pwm(int16_t motor_pwm)	
 {
 	//使用PE3 PE4
@@ -201,8 +201,8 @@ void set_PropellerA_motor_pwm(int16_t motor_pwm)
 //		{
 //			motor_pwm=250;
 //		}
-		EMIOS_0.CH[19].CBDR.R = motor_pwm;//PE3
-		EMIOS_0.CH[20].CBDR.R = 1;//PE4
+		EMIOS_0.CH[19].CBDR.R = 1;//PE3
+		EMIOS_0.CH[20].CBDR.R = motor_pwm;//PE4
 		
 	}
 	else 	
@@ -212,7 +212,7 @@ void set_PropellerA_motor_pwm(int16_t motor_pwm)
 	}
 }
 
-/*---设置螺旋桨B电机MOTOR2---*/
+/*---设置螺旋桨电机B MOTOR2 红蓝线电机---*/
 void set_PropellerB_motor_pwm(int16_t motor_pwm)	
 {
 	//暂时使用PE1,PE2
@@ -227,8 +227,8 @@ void set_PropellerB_motor_pwm(int16_t motor_pwm)
 //		{
 //			motor_pwm=250;
 //		}
-		EMIOS_0.CH[18].CBDR.R = motor_pwm;//PE1
-		EMIOS_0.CH[17].CBDR.R = 1;//PE2
+		EMIOS_0.CH[18].CBDR.R = motor_pwm;//PE2
+		EMIOS_0.CH[17].CBDR.R = 1;//PE1
 		
 	}
 	else 	

@@ -32,15 +32,14 @@ void main(void)
 			AngleControl();
 			BalanceControl();
 
-//			LCD_PrintoutInt(0, 4, AngleResult[0]);
-//			LCD_PrintoutInt(64, 4, AngleResult[1]);
-			LCD_PrintoutInt(0, 0, data_ROLL_angle_pid.p);
-			LCD_PrintoutInt(64, 0, data_ROLL_angle_pid.d);
+			LCD_PrintoutInt(0, 0, AngleResult[0]);
+			LCD_PrintoutInt(64, 0, AngleResult[1]);
+//			LCD_PrintoutInt(0, 0, data_ROLL_angle_pid.p);
+//			LCD_PrintoutInt(64, 0, data_ROLL_angle_pid.d);
 //			LCD_PrintoutInt(0, 0, data_speed_pid.p);
 //			LCD_PrintoutInt(64, 0, data_speed_pid.d);
-			LCD_PrintoutInt(0, 6, AngleCalculate[2]);
-			LCD_PrintoutInt(64, 6, AngleCalculate[3]);
-			
+//			LCD_PrintoutInt(0, 6, AngleCalculate[2]);
+//			LCD_PrintoutInt(64, 6, AngleCalculate[3]);
 
 			/*	前后控制	*/
 			if(AngleCalculate[0]<20&&AngleCalculate[0]>-20)

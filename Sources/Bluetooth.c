@@ -35,11 +35,11 @@ void execute_remote_cmd(const BYTE *data)
 		/* 俯仰陀螺仪标定调参 */
 		case CMD_SET_PITCH_ANGLE_ZERO :
 			set_PITCH_angle_zero(*((SWORD *)(&(data[2]))));
-			LCD_PrintoutInt(0, 6, angle_data.PITCH_angle_zero);
+			LCD_PrintoutInt(0, 2, angle_data.PITCH_angle_zero);
 		break;
 		case CMD_SET_PITCH_ANGLE_SPEED_ZERO :
 			set_PITCH_angle_speed_zero(*((SWORD *)(&(data[2]))));
-			LCD_PrintoutInt(64, 6, angle_data.PITCH_anglespeed_zero);
+			LCD_PrintoutInt(64, 2, angle_data.PITCH_anglespeed_zero);
 		break;
 		
 		case CMD_SET_ANGLE_KP :
@@ -55,11 +55,11 @@ void execute_remote_cmd(const BYTE *data)
 		/* 横滚陀螺仪标定调参 */
 		case CMD_SET_ROLL_ANGLE_ZERO :
 			set_ROLL_angle_zero(*((SWORD *)(&(data[2]))));
-			LCD_PrintoutInt(0, 2, angle_data.ROLL_angle_zero);
+			LCD_PrintoutInt(0, 6, angle_data.ROLL_angle_zero);
 		break;
 		case CMD_SET_ROLL_ANGLE_SPEED_ZERO :
 			set_ROLL_angle_speed_zero(*((SWORD *)(&(data[2]))));
-			LCD_PrintoutInt(64, 2, angle_data.ROLL_anglespeed_zero);
+			LCD_PrintoutInt(64, 6, angle_data.ROLL_anglespeed_zero);
 
 		break;
 		
