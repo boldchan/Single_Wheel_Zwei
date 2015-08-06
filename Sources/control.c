@@ -35,6 +35,12 @@ float g_fGyroscopeTurnSpeed_balance;
 float CarAngleInitial_balance=0;
 float CarAnglespeedInitial_balance=0;
 
+//转向控制全局变量
+//float fDelta_balance;
+float g_fAngleYaw;
+float g_fGyroscopeAngleSpeedYaw;
+float EndYawAngle=90;
+float EndYawAnglespeed=0;
 
 
 // float AngleControlOutMax=0.2, AngleControlOutMin=-0.2;
@@ -146,6 +152,7 @@ void PITCH_motor_control(void)
 //	motor_pwm=speed_pwm;
 	set_PITCH_motor_pwm(motor_pwm);
 }
+
 //void motor_control_balance(void)
 //{
 //	int16_t motor_pwm_balance;
@@ -242,7 +249,7 @@ void PropellerB_Control(void)
 	set_PropellerB_motor_pwm(motor_pwm);
 }
 
-#if 0
+
 /*-----------------------------------------------------------------------*/
 /* 设置转向电机PWM                                                                    */
 /*-----------------------------------------------------------------------*/
@@ -275,7 +282,7 @@ void set_YAW_motor_pwm(int16_t motor_pwm)	//speed_pwm正为向前，负为向后
 		EMIOS_0.CH[18].CBDR.R = 1;	
 	}
 }
-
+#if 0
 void ROLL_motor_control(void)
 {
 	int16_t motor_pwm;
@@ -363,6 +370,54 @@ void BalanceControl(void)
 	//angle_pwm_balance=dta_angle;
 	ROLL_angle_pwm=delta_angle_balance;
 	//LCD_PrintoutInt(0, 6, ROLL_angle_pwm);
+}
+
+/*-----------------------------------------------------------------------*/
+/* 转向控制      by TGC                                                        */
+/*-----------------------------------------------------------------------*/
+
+void YawControl(void)
+{
+	//int i;
+	//float temp_angle, temp_anglespeed;
+	float delta_yaw;
+	
+	g_fAngleYaw=AngleCalculate[2];
+	g_fGyroscopeAngleSpeedYaw=AngleCalculate[3];
+
+	delta_yaw=data_YAW_angle_pid.p*(EndYawAngle-g_fAngleYaw);
+	delta_yaw+=data_YAW_angle_pid.d*(EndYawAnglespeed-g_fGyroscopeAngleSpeedYaw);
+	
+	set_YAW_motor_pwm(delta_yaw);
+	
+	/*set_YAW_motor_pwm(500);
+	delay_ms(3000);
+	set_YAW_motor_pwm(400);
+	delay_ms(1000);
+	set_YAW_motor_pwm(300);
+	delay_ms(1000);
+	set_YAW_motor_pwm(200);
+	delay_ms(1000);
+	set_YAW_motor_pwm(100);
+	delay_ms(1000);
+	set_YAW_motor_pwm(0);
+	delay_ms(1000);
+	
+	set_YAW_motor_pwm(1000);
+		delay_ms(1000);
+	for(i=19;i>=0;i--)
+	{
+		int j=i*50;
+		set_YAW_motor_pwm(j);
+		delay_ms(500);
+		
+	}
+	
+	//set_YAW_motor_pwm(0);
+		delay_ms(6000);
+	*/
+	
+	
 }
 
 

@@ -10,7 +10,9 @@ void main(void)
 	for(;;)
 	{
 		set_key();//按键设置
+		YawControl();
 
+#if 0
 		if (REMOTE_FRAME_STATE_OK == g_remote_frame_state)
 		{
 			g_remote_frame_state = REMOTE_FRAME_STATE_NOK;
@@ -31,6 +33,7 @@ void main(void)
 			set_speed_pwm();
 			AngleControl();
 			BalanceControl();
+			
 
 			LCD_PrintoutInt(0, 0, AngleResult[0]);
 			LCD_PrintoutInt(64, 0, AngleResult[1]);
@@ -101,6 +104,8 @@ void main(void)
 
 		}
 
-	}
+	#endif
+		}
+
 }
 
