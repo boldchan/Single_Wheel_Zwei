@@ -128,7 +128,8 @@ void initEMIOS_0MotorAndSteer(void)
     EMIOS_0.CH[16].CCR.B.UCPRE=0;	/* Set channel prescaler to divide by 1 */
 	EMIOS_0.CH[16].CCR.B.UCPEN = 1;	/* Enable prescaler; uses default divide by 1 */
 	EMIOS_0.CH[16].CCR.B.FREN = 1;	/* Freeze channel counting when in debug mode */
-	EMIOS_0.CH[16].CADR.R = 2000;	/* 设置周期200us 5KHZ */
+	EMIOS_0.CH[16].CADR.R = 2000;	/* 设置周期200us 5KHZ
+	 */
 	EMIOS_0.CH[16].CCR.B.MODE = 0x50;	/* Modulus Counter Buffered (MCB) */
 	EMIOS_0.CH[16].CCR.B.BSL = 0x3;	/* Use internal counter */
 
@@ -400,27 +401,27 @@ void init_all_and_POST(void)
 
 	disable_watchdog();
 	init_modes_and_clock();
-	initEMIOS_0MotorAndSteer();
+	//initEMIOS_0MotorAndSteer();
 	
 	/* PIT：光编读值&速度控制 */
 //	init_pit_10ms();
 	
 	/* PIT：步进电机控制&角度控制标志位 */
-	init_pit_1ms();	
+	//init_pit_1ms();	
 	
 	
-	init_Stepmotor();		/* 初始化步进电机 */
+	//init_Stepmotor();		/* 初始化步进电机 */
 
 	init_led();
-	init_DIP();				/* 拨码开关 */
-	init_key();				/* 按键 */
+	//init_DIP();				/* 拨码开关 */
+	//init_key();				/* 按键 */
 	init_serial_port_1();	/* BlueTooth */
 
-	init_ADC();				/* 陀螺仪读值*/
-	init_optical_encoder();	/* 光编 */
+	//init_ADC();				/* 陀螺仪读值*/
+	//init_optical_encoder();	/* 光编 */
 
 	//init_I2C();
-	init_choose_mode();		/* 拨码开关模式选择 */
+	//init_choose_mode();		/* 拨码开关模式选择 */
 	
 	
 	/* 初始化SPI总线 */
@@ -440,9 +441,12 @@ void init_all_and_POST(void)
 
 	/* 初始化陀螺仪 */
 //	init_MPU9250();
+	
+	/* 初始化电子罗盘 */
+	init_GY953();
 
 	/* 读取拨码开关模式号 */
-	read_DIP_mode();
+	//read_DIP_mode();
 
 	delay_ms(1000);
 	/* 换屏 */

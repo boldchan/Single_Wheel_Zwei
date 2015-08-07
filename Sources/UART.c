@@ -15,12 +15,14 @@ void init_serial_port_1(void)
 	LINFLEX_1.LINCR1.B.INIT=1;	//进入初始化模式
 	LINFLEX_1.LINCR1.R=0x00000015;
 //#ifndef PERIPH_SET_1_CLK_16M
-//	LINFLEX_1.LINIBRR.B.DIV_M= 520; //57600:86&13  9600:520&13
 //    LINFLEX_1.LINFBRR.B.DIV_F =13;
+//	LINFLEX_1.LINIBRR.B.DIV_M= 520; //57600:86&13  9600:520&13
 //#else
-	LINFLEX_1.LINIBRR.B.DIV_M= 26; 	//38400:26&1	57600:17&6
-    LINFLEX_1.LINFBRR.B.DIV_F = 1;
+//    LINFLEX_1.LINFBRR.B.DIV_F = 1;
+//	LINFLEX_1.LINIBRR.B.DIV_M= 26; 	//38400:26&1	57600:17&6
 //#endif
+    LINFLEX_1.LINFBRR.B.DIV_F = 3;	//小数部分先写
+	LINFLEX_1.LINIBRR.B.DIV_M= 104; 	//9600
 
     LINFLEX_1.UARTCR.B.UART=1;
 	LINFLEX_1.UARTCR.R=0x00000033;
@@ -38,9 +40,11 @@ void init_serial_port_1(void)
 #if 1
 void serial_port_1_TX(unsigned char data)
 {
+	LINFLEX_1.LINIER.B.DRIE=0;	//关中断
 	LINFLEX_1.BDRL.B.DATA0=data;	//发送语句
 	while(!LINFLEX_1.UARTSR.B.DTF){}	//等待数据发送完成
 	LINFLEX_1.UARTSR.B.DTF=1;	//清空标志位
+	LINFLEX_1.LINIER.B.DRIE=1;	//开中断
 }
 #endif
 
@@ -59,12 +63,14 @@ void intc_serial_port_1_RX()
 {
 	BYTE rev_ch;
 	
+	D5=~D5;
 	while(!LINFLEX_1.UARTSR.B.DRF){}
 	rev_ch = (BYTE)LINFLEX_1.BDRM.B.DATA4;
 	g_serial_port_1_f = 1;
 	g_serial_port_1_data = rev_ch;
-	LINFLEX_1.UARTSR.B.DRF=1;
 	rev_remote_frame_2(rev_ch);
+	LINFLEX_1.UARTSR.B.RMB=1;		//Release Message Buffer !!!
+	LINFLEX_1.UARTSR.B.DRF=1;
 }
 
 
@@ -79,11 +85,11 @@ void init_serial_port_3(void)
 	LINFLEX_3.LINCR1.R=0x00000011; 
 	LINFLEX_3.LINIER.B.DRIE=1;
 #ifndef PERIPH_SET_1_CLK_16M
-	LINFLEX_3.LINIBRR.B.DIV_M= 520;
     LINFLEX_3.LINFBRR.B.DIV_F = 83;
+	LINFLEX_3.LINIBRR.B.DIV_M= 520;
 #else
-	LINFLEX_3.LINIBRR.B.DIV_M= 104;
     LINFLEX_3.LINFBRR.B.DIV_F = 3;
+	LINFLEX_3.LINIBRR.B.DIV_M= 104;
 #endif
     LINFLEX_3.UARTCR.B.UART=1;
 	LINFLEX_3.UARTCR.R=0x00000033;

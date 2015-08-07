@@ -59,10 +59,12 @@ typedef unsigned short word;
 
 
 ///****************第二版载LED&车灯****************///
+#if 1
 #define D5 SIU.GPDO[12].B.PDO
 #define D6 SIU.GPDO[13].B.PDO
 #define D7 SIU.GPDO[14].B.PDO
 #define D8 SIU.GPDO[15].B.PDO
+#endif
 
 
 /***************DIP*****************/

@@ -242,7 +242,7 @@ void PropellerB_Control(void)
 	set_PropellerB_motor_pwm(motor_pwm);
 }
 
-#if 0
+#if 1
 /*-----------------------------------------------------------------------*/
 /* 设置转向电机PWM                                                                    */
 /*-----------------------------------------------------------------------*/
@@ -497,6 +497,7 @@ void set_pwm3_target(SWORD speed_pwm)
 /*-----------------------------------------------------------------------*/
 void set_speed_PID(void) 
 { 
+	
 	
 	if(data_speed_settings.speed_target==0)
 	{
