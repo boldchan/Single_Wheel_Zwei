@@ -5,12 +5,20 @@ BYTE  SpeedCountFlag=0;
 
 void main(void)
 {
+	uint8_t GY953_Data[41];
 	init_all_and_POST();
-	set_speed_target(0);
+	//set_speed_target(0);
 	for(;;)
 	{
-		set_key();//按键设置
+		Read_GYalldata(GY953_Data);
+		//send_data2PC(3,ANGLE_TYPE,GY953_Data);
+		//send_data2PC(3,GYR_TYPE,GY953_Data);
+		delay_ms(5);
 
+		set_key();//按键设置
+		YawControl();
+
+#if 0
 		if (REMOTE_FRAME_STATE_OK == g_remote_frame_state)
 		{
 			g_remote_frame_state = REMOTE_FRAME_STATE_NOK;
@@ -45,6 +53,7 @@ void main(void)
 				LCD_PrintoutInt(0, 4, AngleCalculate[0]);
 				LCD_PrintoutInt(64, 4, AngleCalculate[1]);
 			}
+			
 //			LCD_PrintoutInt(0, 0, data_ROLL_angle_pid.p);
 //			LCD_PrintoutInt(64, 0, data_ROLL_angle_pid.d);
 //			LCD_PrintoutInt(0, 0, data_speed_pid.p);
@@ -76,6 +85,11 @@ void main(void)
 				set_PropellerA_motor_pwm(-2000);
 				set_PropellerB_motor_pwm(2000);
 			}
+			if(count==3)
+			{
+				set_PropellerA_motor_pwm(-1);
+				set_PropellerB_motor_pwm(-1);
+			}
 //			if(count==3)
 //			{
 //				/*	平衡控制	*/ 
@@ -101,10 +115,11 @@ void main(void)
 //					LCD_PrintoutInt(0, 4, data_speed_pid.p);
 //					LCD_PrintoutInt(64, 4, data_speed_pid.d);
 //					LCD_PrintoutInt(0, 4, data_speed_settings.speed_target);
-//					LCD_PrintoutInt(65, 4, data_encoder1.speed_real);
+					LCD_PrintoutInt(65, 4, data_encoder1.speed_real);
 					SpeedCountFlag=0;
 				}
 			}
+
 			
 			if(count==5)
 			{
@@ -114,6 +129,8 @@ void main(void)
 
 		}
 
-	}
+	#endif
+		}
+
 }
 

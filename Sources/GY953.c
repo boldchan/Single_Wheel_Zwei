@@ -14,12 +14,14 @@ void init_GY953(void)
 /*------------------------------------------------------------------------------*/
 /* 读取三计校准精度
 /* 有数据更新返回1 无新数据返回0 
-/* Data[0]加速度计	Data[1]陀螺计	Data[2]磁场计	(低0~3高)
+/* Data[0]加速度计	Data[1]陀螺计	Data[2]磁场计 Data[3]数据输出速率	(低0~4高)
 /*------------------------------------------------------------------------------*/
 int Read_Precision(BYTE* Data)
 {
 	BYTE state;
+	BYTE set;
 	while(!GY953_Read(STATE_C,&state)){};
+	while(!GY953_Read(SET_A,&set)){};
 	if(state>>7)
 	{
 		Data[0]=state&0x30;
@@ -27,6 +29,7 @@ int Read_Precision(BYTE* Data)
 		Data[1]=state&0x0C;
 		Data[1]>>=2;
 		Data[2]=state&0x03;
+		Data[3]=set&0x07;
 		return 1;
 	}
 	else
@@ -43,14 +46,29 @@ int Read_Precision(BYTE* Data)
 /*------------------------------------------------------------------------------*/
 int Read_GYalldata(BYTE* Data)
 {
-	BYTE data[]={0};
-	BYTE reg=0x01;
+	uint32_t tmp_tx = 0x00000000;
+	uint8_t tmp_rx;
+	uint8_t reg=0x01;
 	int i=0;
+	
+	tmp_tx = 0xA8080000|(reg&0x3F)|0xC0;
+	DSPI_1.PUSHR.R = tmp_tx;
+	while(!DSPI_1.SR.B.TCF){}
+	tmp_rx = (uint8_t)DSPI_1.POPR.B.RXDATA;
+	DSPI_1.SR.B.TCF = 1;
+	
 	for(i=0;i<41;i++)
 	{
-		while(!GY953_Read(reg,&data[i])){};
+		tmp_tx = 0x28080000|0xff;
+		DSPI_1.PUSHR.R = tmp_tx;
+		while(!DSPI_1.SR.B.TCF){}
+		tmp_rx = (uint8_t)DSPI_1.POPR.B.RXDATA;
+		DSPI_1.SR.B.TCF = 1;
+		
+		Data[i]=tmp_rx;	
 		reg++;
 	}
+
 	return 1;
 }
 /*------------------------------------------------------------------------------*/
@@ -82,11 +100,10 @@ int GY953_Read(uint8_t reg,uint8_t* Data)
 /* GY953寄存器连续一次性读取
 /* 成功返回1 
 /*------------------------------------------------------------------------------*/
-int GY953_multi_Read(uint8_t* Data)
+int GY953_multi_Read(uint8_t* Data,uint8_t reg)
 {
 	uint32_t tmp_tx = 0x00000000;
 	uint8_t tmp_rx;
-	uint8_t reg=0x01;
 	int i=0;
 	
 	for(i=0;i<41;i++)

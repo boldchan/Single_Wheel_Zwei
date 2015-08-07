@@ -135,6 +135,23 @@ extern struct
 	float d;
 } data_ROLL_angle_pid;
 #endif
+
+/*转向PID数据*/
+#ifdef __CONTROL_C_
+struct
+{
+	float p;
+	float i;
+	float d;
+} data_YAW_angle_pid = { 60, 0, 37 };
+#else
+extern struct
+{
+	float p;
+	float i;
+	float d;
+} data_YAW_angle_pid;
+#endif
 /* 速度设置数据 */
 #ifdef __CONTROL_C_
 struct
@@ -207,6 +224,8 @@ extern void set_angle_KD(float kp);
 extern void set_ROLL_KP(float kp);
 extern void set_ROLL_KI(float kp);
 extern void set_ROLL_KD(float kp);
+
+extern void YawControl(void);
 
 
 

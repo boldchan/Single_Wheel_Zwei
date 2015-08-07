@@ -32,7 +32,7 @@ void distance(void)
 	xs=xs+xv*stime;			//求x方向距离
 
 	if(xs>=2)				//2米标志
-		D5=0;
+	//	D5=0;
 	
 	//显示屏显示
 	LCD_Write_Num(80,1,Data[3],5);
