@@ -35,6 +35,12 @@ float g_fGyroscopeTurnSpeed_balance;
 float CarAngleInitial_balance=0;
 float CarAnglespeedInitial_balance=0;
 
+//转向控制全局变量
+//float fDelta_balance;
+float g_fAngleYaw;
+float g_fGyroscopeAngleSpeedYaw;
+float EndYawAngle=90;
+float EndYawAnglespeed=0;
 
 
 // float AngleControlOutMax=0.2, AngleControlOutMin=-0.2;
@@ -146,6 +152,7 @@ void PITCH_motor_control(void)
 //	motor_pwm=speed_pwm;
 	set_PITCH_motor_pwm(motor_pwm);
 }
+
 //void motor_control_balance(void)
 //{
 //	int16_t motor_pwm_balance;
@@ -186,19 +193,23 @@ void set_ROLL_motor_pwm(int16_t motor_pwm)	//speed_pwm正为向前，负为向�
 	}
 }
 #endif
-/*----设置螺旋桨电机A-------*/
+/*----设置螺旋桨电机A MOTOR3 黑白线电机-------*/
 void set_PropellerA_motor_pwm(int16_t motor_pwm)	
 {
 	//使用PE3 PE4
-	motor_pwm=1000+motor_pwm;
+	motor_pwm=900+motor_pwm;
 	if (motor_pwm>0)	
 	{
-		if (motor_pwm>1950)
+		if (motor_pwm>1800)//最高电压7.2V
 		{
-			motor_pwm = 1950;
+			motor_pwm = 1800;
 		}
-		EMIOS_0.CH[19].CBDR.R = motor_pwm;//PE3
-		EMIOS_0.CH[20].CBDR.R = 1;//PE4
+//		else if(motor_pwm<250)//死区电压1V
+//		{
+//			motor_pwm=250;
+//		}
+		EMIOS_0.CH[19].CBDR.R = 1;//PE3
+		EMIOS_0.CH[20].CBDR.R = motor_pwm;//PE4
 		
 	}
 	else 	
@@ -208,19 +219,23 @@ void set_PropellerA_motor_pwm(int16_t motor_pwm)
 	}
 }
 
-/*---设置螺旋桨B电机---*/
+/*---设置螺旋桨电机B MOTOR2 红蓝线电机---*/
 void set_PropellerB_motor_pwm(int16_t motor_pwm)	
 {
 	//暂时使用PE1,PE2
-	motor_pwm=1000-motor_pwm;
+	motor_pwm=900-motor_pwm;
 	if (motor_pwm>0)	
 	{
-		if (motor_pwm>1950)
+		if (motor_pwm>1800)//最高电压7.2V
 		{
-			motor_pwm = 1950;
+			motor_pwm = 1800;
 		}
-		EMIOS_0.CH[17].CBDR.R = motor_pwm;//PE1
-		EMIOS_0.CH[18].CBDR.R = 1;//PE2
+//		else if(motor_pwm<250)//死区电压1V
+//		{
+//			motor_pwm=250;
+//		}
+		EMIOS_0.CH[18].CBDR.R = motor_pwm;//PE2
+		EMIOS_0.CH[17].CBDR.R = 1;//PE1
 		
 	}
 	else 	
@@ -242,7 +257,8 @@ void PropellerB_Control(void)
 	set_PropellerB_motor_pwm(motor_pwm);
 }
 
-#if 1
+
+
 /*-----------------------------------------------------------------------*/
 /* 设置转向电机PWM                                                                    */
 /*-----------------------------------------------------------------------*/
@@ -275,7 +291,7 @@ void set_YAW_motor_pwm(int16_t motor_pwm)	//speed_pwm正为向前，负为向后
 		EMIOS_0.CH[18].CBDR.R = 1;	
 	}
 }
-
+#if 0
 void ROLL_motor_control(void)
 {
 	int16_t motor_pwm;
@@ -346,7 +362,7 @@ void BalanceControl(void)
 	if(g_fCarAngle_balance>7||g_fCarAngle_balance<-7)
 	{
 		temp_d=0;
-		temp_p=90;
+		temp_p=400;
 	}
 	else
 	{
@@ -362,7 +378,55 @@ void BalanceControl(void)
 	//	delta_angle_balance+=data_speed_pid.d*0.4*delta_anglespeed_balance;	  
 	//angle_pwm_balance=dta_angle;
 	ROLL_angle_pwm=delta_angle_balance;
-	//LCD_PrintoutInt(0, 6, ROLL_angle_pwm);
+	LCD_PrintoutInt(0, 2, ROLL_angle_pwm);
+}
+
+/*-----------------------------------------------------------------------*/
+/* 转向控制      by TGC                                                        */
+/*-----------------------------------------------------------------------*/
+
+void YawControl(void)
+{
+	//int i;
+	//float temp_angle, temp_anglespeed;
+	float delta_yaw;
+	
+	g_fAngleYaw=AngleCalculate[2];
+	g_fGyroscopeAngleSpeedYaw=AngleCalculate[3];
+
+	delta_yaw=data_YAW_angle_pid.p*(EndYawAngle-g_fAngleYaw);
+	delta_yaw+=data_YAW_angle_pid.d*(EndYawAnglespeed-g_fGyroscopeAngleSpeedYaw);
+	
+	set_YAW_motor_pwm(delta_yaw);
+	
+	/*set_YAW_motor_pwm(500);
+	delay_ms(3000);
+	set_YAW_motor_pwm(400);
+	delay_ms(1000);
+	set_YAW_motor_pwm(300);
+	delay_ms(1000);
+	set_YAW_motor_pwm(200);
+	delay_ms(1000);
+	set_YAW_motor_pwm(100);
+	delay_ms(1000);
+	set_YAW_motor_pwm(0);
+	delay_ms(1000);
+	
+	set_YAW_motor_pwm(1000);
+		delay_ms(1000);
+	for(i=19;i>=0;i--)
+	{
+		int j=i*50;
+		set_YAW_motor_pwm(j);
+		delay_ms(500);
+		
+	}
+	
+	//set_YAW_motor_pwm(0);
+		delay_ms(6000);
+	*/
+	
+	
 }
 
 

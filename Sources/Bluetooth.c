@@ -55,9 +55,12 @@ void execute_remote_cmd(const BYTE *data)
 		/* 横滚陀螺仪标定调参 */
 		case CMD_SET_ROLL_ANGLE_ZERO :
 			set_ROLL_angle_zero(*((SWORD *)(&(data[2]))));
+			LCD_PrintoutInt(0, 6, angle_data.ROLL_angle_zero);
 		break;
 		case CMD_SET_ROLL_ANGLE_SPEED_ZERO :
 			set_ROLL_angle_speed_zero(*((SWORD *)(&(data[2]))));
+			LCD_PrintoutInt(64, 6, angle_data.ROLL_anglespeed_zero);
+
 		break;
 		
 		/* 航向角陀螺仪标定调参 */
@@ -82,12 +85,14 @@ void execute_remote_cmd(const BYTE *data)
 		
 		case CMD_SET_MOTOR1_KP :
 			set_ROLL_KP(*((SWORD *)(&(data[2]))));
+//			LCD_PrintoutInt(0, 4, data_ROLL_angle_pid.p);
 		break;
 		case CMD_SET_MOTOR1_KI :
 			set_ROLL_KI(*((SWORD *)(&(data[2]))));
 		break;
 		case CMD_SET_MOTOR1_KD :
 			set_ROLL_KD(*((SWORD *)(&(data[2]))));
+//			LCD_PrintoutInt(64, 4, data_ROLL_angle_pid.d);
 		break;
 
 		
@@ -126,10 +131,10 @@ int rev_remote_frame_2(BYTE rev)
 	uint8_t num[4]={0};
 	if (g_remote_frame_cnt == 0)	//接收帧头
 	{
-		if (rev == 0x5A)
+		if (rev == 0xA5)
 		{
 			D6=~D6;
-			remote_frame_data[g_remote_frame_cnt++] = 0x5A;
+			remote_frame_data[g_remote_frame_cnt++] = 0xA5;
 		}
 	}
 	else if (g_remote_frame_cnt == 1)	//接收命令类型
