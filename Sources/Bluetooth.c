@@ -35,11 +35,11 @@ void execute_remote_cmd(const BYTE *data)
 		/* 俯仰陀螺仪标定调参 */
 		case CMD_SET_PITCH_ANGLE_ZERO :
 			set_PITCH_angle_zero(*((SWORD *)(&(data[2]))));
-			LCD_PrintoutInt(0, 2, angle_data.PITCH_angle_zero);
+			LCD_PrintoutInt(0, 6, angle_data.PITCH_angle_zero);
 		break;
 		case CMD_SET_PITCH_ANGLE_SPEED_ZERO :
 			set_PITCH_angle_speed_zero(*((SWORD *)(&(data[2]))));
-			LCD_PrintoutInt(64, 2, angle_data.PITCH_anglespeed_zero);
+			LCD_PrintoutInt(64, 6, angle_data.PITCH_anglespeed_zero);
 		break;
 		
 		case CMD_SET_ANGLE_KP :
@@ -85,14 +85,14 @@ void execute_remote_cmd(const BYTE *data)
 		break;
 		
 		case CMD_SET_MOTOR1_KP :
-			set_ROLL_KP(*((SWORD *)(&(data[2]))));
+			set_speed_KP(*((SWORD *)(&(data[2]))));
 //			LCD_PrintoutInt(0, 4, data_ROLL_angle_pid.p);
 		break;
 		case CMD_SET_MOTOR1_KI :
 			set_ROLL_KI(*((SWORD *)(&(data[2]))));
 		break;
 		case CMD_SET_MOTOR1_KD :
-			set_ROLL_KD(*((SWORD *)(&(data[2]))));
+			set_speed_KD(*((SWORD *)(&(data[2]))));
 //			LCD_PrintoutInt(64, 4, data_ROLL_angle_pid.d);
 		break;
 
@@ -101,6 +101,15 @@ void execute_remote_cmd(const BYTE *data)
 		/* 左右平衡电机调参 	*/
 		case CMD_SET_MOTOR2_PWM_TARGET :
 			set_pwm2_target(*((SWORD *)(&(data[2]))));
+		break;
+		case CMD_SET_ROLL_KP :
+			set_ROLL_KP(*((SWORD *)(&(data[2]))));
+		break;
+		case CMD_SET_ROLL_KI :
+			set_ROLL_KI(*((SWORD *)(&(data[2]))));
+		break;
+		case CMD_SET_ROLL_KD :
+			set_ROLL_KD(*((SWORD *)(&(data[2]))));
 		break;
 		
 		/* 航向角电机调参 	*/

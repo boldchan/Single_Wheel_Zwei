@@ -28,13 +28,20 @@
 
 /* 横滚电机远程调参 */
 #define CMD_SET_MOTOR2_PWM_TARGET (0x14)	/* 远程修改电机占空比 */
+#define CMD_SET_ROLL_KP (0x22)
+#define CMD_SET_ROLL_KI (0x23)
+#define CMD_SET_ROLL_KD (0x24)
 
 /* 航向角电机远程调参 */
 #define CMD_SET_MOTOR3_PWM_TARGET (0x15)	/* 远程修改电机占空比 */
+#define CMD_SET_YAW_KP (0x26)
+#define CMD_SET_YAW_KI (0x27)
+#define CMD_SET_YAW_KD (0x28)
 
 /* 上位机控制 */
 #define CMD_START_CONTROL (0x20)/* 开始PC控制 */
 #define CMD_STOP_CONTROL (0x21)	/* 结束PC控制 */
+
 
 /* 封装帧数据 */
 #define REMOTE_FRAME_LENGTH (24)//余婧修改

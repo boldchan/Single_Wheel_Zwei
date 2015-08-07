@@ -136,6 +136,7 @@ void set_PITCH_motor_pwm(int16_t motor_pwm)	//speed_pwm正为向前，负为向�
 		EMIOS_0.CH[21].CBDR.R = 1;
 		EMIOS_0.CH[22].CBDR.R = 1;	
 	}
+	LCD_PrintoutInt(64, 2, motor_pwm);
 }
 void PITCH_motor_control(void)
 {
@@ -145,6 +146,7 @@ void PITCH_motor_control(void)
 
 //	motor_pwm=speed_pwm;
 	set_PITCH_motor_pwm(motor_pwm);
+	
 }
 //void motor_control_balance(void)
 //{
@@ -356,6 +358,11 @@ void BalanceControl(void)
 		temp_d=0;
 		temp_p=400;
 	}
+	else if (g_fCarAngle_balance>2||g_fCarAngle_balance<-2)
+	{
+		temp_p=data_ROLL_angle_pid.p+20;
+		temp_d=data_ROLL_angle_pid.d;
+	}
 	else
 	{
 		temp_p=data_ROLL_angle_pid.p;
@@ -370,6 +377,14 @@ void BalanceControl(void)
 	//	delta_angle_balance+=data_speed_pid.d*0.4*delta_anglespeed_balance;	  
 	//angle_pwm_balance=dta_angle;
 	ROLL_angle_pwm=delta_angle_balance;
+	if(ROLL_angle_pwm>2000)
+	{
+		ROLL_angle_pwm=2000;
+	}
+	else if (ROLL_angle_pwm<-2000)
+	{
+		ROLL_angle_pwm=-2000;
+	}
 	LCD_PrintoutInt(0, 2, ROLL_angle_pwm);
 }
 

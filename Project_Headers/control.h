@@ -126,7 +126,7 @@ struct
 	float p;
 	float i;
 	float d;
-} data_ROLL_angle_pid = { 60, 0, 37 };
+} data_ROLL_angle_pid = { 80, 0, 17 };//原来 p 60 d 37
 #else
 extern struct
 {
