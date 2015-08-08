@@ -7,6 +7,7 @@ int g_f_enable_mag_steer_control = 0;
 int g_f_enable_speed_control = 0;	/* 启用闭环速度控制标志位 */
 int g_f_enable_pwm_control = 0;	/* 启用开环速度控制标志位 */
 int speed = 0;
+int g_pit_cnt=0;
 int update_steer_helm_basement_to_steer_helm(void);
 
 int counter=0;
@@ -39,8 +40,10 @@ float CarAnglespeedInitial_balance=0;
 //float fDelta_balance;
 float g_fAngleYaw;
 float g_fGyroscopeAngleSpeedYaw;
-float EndYawAngle=90;
+float EndYawAngle;
 float EndYawAnglespeed=0;
+int g_turn_start=0;
+int g_turn_state=0;
 
 
 // float AngleControlOutMax=0.2, AngleControlOutMin=-0.2;
@@ -66,7 +69,48 @@ DWORD tmp_a, tmp_b;
 /*-----------------------------------------------------------------------*/
 void PitISR(void)
 {
-	get_speed_now();//光编读值
+	if(g_turn_start==1)
+	{
+		EndYawAngle=g_fAngleYaw+90;
+		g_turn_start=0;
+		g_turn_state=1;
+	}
+	if(g_turn_state==1)
+	{
+		float delta_yaw;
+		
+		
+		if(g_pit_cnt==0)
+		{
+			delta_yaw=EndYawAngle-g_fAngleYaw;
+			if(delta_yaw>10)
+				set_YAW_motor_pwm(-1000);
+			else if(delta_yaw<-10)
+				set_YAW_motor_pwm(1000);
+			else
+				set_YAW_motor_pwm(-100*delta_yaw);	
+		}
+		else if((g_pit_cnt>=100)&&(g_pit_cnt<=1100)&&(g_pit_cnt%50==0))
+		{
+			int16_t j;
+			if(delta_yaw>10)
+				j=-1100+g_pit_cnt;
+			else if(delta_yaw<-10)
+				j=1100-g_pit_cnt;
+			else
+				j=-delta_yaw*(1100-g_pit_cnt)/10;
+			set_YAW_motor_pwm(j);
+		}
+		else if(g_pit_cnt>=1200)
+		{
+			g_pit_cnt=-1;
+		}
+		
+		g_pit_cnt++;
+		//转向电机控制
+	}
+	
+	//get_speed_now();//光编读值
 	/* 开始执行速度控制算法 */
 	PIT.CH[1].TFLG.B.TIF = 1;	// MPC56xxB/P/S: Clear PIT 1 flag by writing 1
 }
@@ -387,46 +431,43 @@ void BalanceControl(void)
 
 void YawControl(void)
 {
-	//int i;
+	int i;
 	//float temp_angle, temp_anglespeed;
+	
+  //pid控制	
 	float delta_yaw;
 	
-	g_fAngleYaw=AngleCalculate[2];
-	g_fGyroscopeAngleSpeedYaw=AngleCalculate[3];
+	//g_fGyroscopeAngleSpeedYaw=AngleCalculate[3];
 
 	delta_yaw=data_YAW_angle_pid.p*(EndYawAngle-g_fAngleYaw);
-	delta_yaw+=data_YAW_angle_pid.d*(EndYawAnglespeed-g_fGyroscopeAngleSpeedYaw);
+	//delta_yaw+=data_YAW_angle_pid.d*(EndYawAnglespeed-g_fGyroscopeAngleSpeedYaw);
 	
 	set_YAW_motor_pwm(delta_yaw);
 	
-	/*set_YAW_motor_pwm(500);
-	delay_ms(3000);
-	set_YAW_motor_pwm(400);
-	delay_ms(1000);
-	set_YAW_motor_pwm(300);
-	delay_ms(1000);
-	set_YAW_motor_pwm(200);
-	delay_ms(1000);
-	set_YAW_motor_pwm(100);
-	delay_ms(1000);
-	set_YAW_motor_pwm(0);
-	delay_ms(1000);
+//	set_YAW_motor_pwm(500);
+//	delay_ms(3000);
+//	set_YAW_motor_pwm(400);
+//	delay_ms(1000);
+//	set_YAW_motor_pwm(300);
+//	delay_ms(1000);
+//	set_YAW_motor_pwm(200);
+//	delay_ms(1000);
+//	set_YAW_motor_pwm(100);
+//	delay_ms(1000);
+//	set_YAW_motor_pwm(0);
+//	delay_ms(1000);
 	
-	set_YAW_motor_pwm(1000);
-		delay_ms(1000);
-	for(i=19;i>=0;i--)
-	{
-		int j=i*50;
-		set_YAW_motor_pwm(j);
-		delay_ms(500);
-		
-	}
+//	set_YAW_motor_pwm(1000);
+//		delay_ms(1000);
+//	for(i=19;i>=0;i--)
+//	{
+//		int j=i*50;
+//		set_YAW_motor_pwm(j);
+//		delay_ms(500);
+//		
+//	}
 	
-	//set_YAW_motor_pwm(0);
-		delay_ms(6000);
-	*/
-	
-	
+	//set_YAW_motor_pwm(0);	
 }
 
 
