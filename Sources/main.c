@@ -42,16 +42,26 @@ void main(void)
 			set_speed_pwm();
 			AngleControl();
 			BalanceControl();
+			if(flagkey2==1)
+			{
+				LCD_PrintoutInt(0, 0, AngleResult[2]);
+				LCD_PrintoutInt(64, 0, AngleResult[3]);
+				LCD_PrintoutInt(0, 4, AngleCalculate[2]);
+				LCD_PrintoutInt(64, 4, AngleCalculate[3]);
+			}
+			if(flagkey1==1)
+			{
+				LCD_PrintoutInt(0, 0, AngleResult[0]);
+				LCD_PrintoutInt(64, 0, AngleResult[1]);
+				LCD_PrintoutInt(0, 4, AngleCalculate[0]);
+				LCD_PrintoutInt(64, 4, AngleCalculate[1]);
+			}
 			
-
-			LCD_PrintoutInt(0, 0, AngleResult[0]);
-			LCD_PrintoutInt(64, 0, AngleResult[1]);
 //			LCD_PrintoutInt(0, 0, data_ROLL_angle_pid.p);
 //			LCD_PrintoutInt(64, 0, data_ROLL_angle_pid.d);
 //			LCD_PrintoutInt(0, 0, data_speed_pid.p);
 //			LCD_PrintoutInt(64, 0, data_speed_pid.d);
-//			LCD_PrintoutInt(0, 6, AngleCalculate[2]);
-//			LCD_PrintoutInt(64, 6, AngleCalculate[3]);
+			
 
 			/*	前后控制	*/
 			if(AngleCalculate[0]<20&&AngleCalculate[0]>-20)
@@ -64,8 +74,8 @@ void main(void)
 				set_PITCH_motor_pwm(0);
 			}
 #endif
-			LCD_PrintoutInt(0, 4, AngleResult[2]);
-			LCD_PrintoutInt(64, 4, AngleResult[3]);
+//			LCD_PrintoutInt(0, 4, AngleResult[2]);
+//			LCD_PrintoutInt(64, 4, AngleResult[3]);
 			if(AngleCalculate[2]<20&&AngleCalculate[2]>-20)
 			{ 
 				//ROLL_motor_control();
