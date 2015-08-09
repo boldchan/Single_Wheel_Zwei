@@ -137,6 +137,59 @@ void execute_remote_cmd(const BYTE *data)
 /*-----------------------------------------------------------------------*/
 int rev_remote_frame_2(BYTE rev)
 {
+	if (g_remote_frame_cnt == 0)	//接收帧头
+	{
+		if (rev == 0x5A)
+		{
+			remote_frame_data[g_remote_frame_cnt++] = 0x5A;
+		}
+	}
+	else if (g_remote_frame_cnt == 1)	//接收帧头
+	{
+		if (rev == 0x5A)
+		{
+			remote_frame_data[g_remote_frame_cnt++] = 0x5A;
+		}
+		else
+		{
+			g_remote_frame_cnt = 0;
+		}
+	}
+	else if (g_remote_frame_cnt == 2)	//接收数据类型
+	{
+		remote_frame_data[g_remote_frame_cnt++] = rev;
+	}
+	else if (g_remote_frame_cnt == 3)	//接收长度
+	{
+		remote_frame_data[g_remote_frame_cnt++] = rev;
+
+		if (rev+5>REMOTE_FRAME_LENGTH)	//判断是否会导致缓冲区溢出
+		{
+			g_remote_frame_cnt = 0;
+		}
+	}
+	else if (g_remote_frame_cnt>3 && g_remote_frame_cnt<=remote_frame_data[3]+3)	//接收数据区
+	{
+		remote_frame_data[g_remote_frame_cnt++] = rev;
+	}
+	else if (g_remote_frame_cnt==remote_frame_data[3]+4)	//接收校验字节	
+	{
+		BYTE sum;
+		remote_frame_data[g_remote_frame_cnt++] = rev;
+		sum = check_sum((const BYTE *)(remote_frame_data), (BYTE)(remote_frame_data[3]+4));
+		if (sum != remote_frame_data[remote_frame_data[3]+4])
+		{
+			g_remote_frame_cnt = 0;	//CheckSum Fail
+		}
+		else
+		{
+			g_remote_frame_cnt = 0;
+			g_remote_frame_state = REMOTE_FRAME_STATE_OK;	//CheckSum Success
+		}
+	}
+	
+	return g_remote_frame_state;
+#if 0
 	uint8_t num[4]={0};
 	if (g_remote_frame_cnt == 0)	//接收帧头
 	{
@@ -178,6 +231,7 @@ int rev_remote_frame_2(BYTE rev)
 	}
 	
 	return g_remote_frame_state;
+#endif
 }
 
 
