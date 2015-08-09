@@ -33,8 +33,10 @@ extern int counter;
 extern float  angle_pwm;
 extern BYTE speed_period;
 
-
-
+extern float temp_p,temp_d;
+extern float maxep,maxecp;
+extern float maxen,maxecn;
+extern void getmax(void);
 
 /* 时间基准 */
 #ifdef __CONTROL_C_

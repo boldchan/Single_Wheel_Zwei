@@ -9,5 +9,7 @@
 extern void set_key(void);
 extern int flagkey1;
 extern int flagkey2;
+extern int flagkey3;
+extern int flagkey4;
 
 #endif /* DEBUG_H_ */

@@ -2,6 +2,8 @@
 #include "includes.h"
 int flagkey1=0;
 int flagkey2=0;
+int flagkey3=0;
+int flagkey4=0;
 void set_key(void)
 {
 	if(key1==0)
@@ -12,6 +14,9 @@ void set_key(void)
 			while(!key1);
 			flagkey1=1;
 			flagkey2=0;
+			flagkey3=0;
+			flagkey4=0;
+			LCD_Fill(0x00);
 			/*功能待添加*/
 		}
 	}
@@ -22,8 +27,11 @@ void set_key(void)
 		if(key2==0)	
 		{
 			while(!key2);
-			flagkey2=1;
 			flagkey1=0;
+			flagkey2=1;
+			flagkey3=0;
+			flagkey4=0;
+			LCD_Fill(0x00);
 			/*功能待添加*/
 		}
 	}
@@ -36,6 +44,8 @@ void set_key(void)
 			while(!key3);
 			flagkey1=0;
 			flagkey2=0;
+			flagkey3=1;
+			flagkey4=0;
 			LCD_Fill(0x00);
 			/*功能待添加*/
 		}
@@ -47,7 +57,11 @@ void set_key(void)
 		if(key4==0)	
 		{
 			while(!key4);
-			angle_data.PITCH_anglespeed_zero++;
+			flagkey1=0;
+			flagkey2=0;
+			flagkey3=0;
+			flagkey4=1;
+			LCD_Fill(0x00);
 			/*功能待添加*/
 		}
 	}

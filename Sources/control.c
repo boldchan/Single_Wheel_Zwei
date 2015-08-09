@@ -11,6 +11,10 @@ int update_steer_helm_basement_to_steer_helm(void);
 
 int counter=0;
 
+float temp_p,temp_d;
+float maxep=0,maxecp=0;
+float maxen=0,maxecn=0;
+
 //速度控制全局变量
 static float d_speed_pwm=0;
 static float speed_pwm=0;
@@ -344,6 +348,47 @@ void AngleControl(void)
   
 }
 
+void Fuzzypid_Control(void)
+{
+	float ke,kec,ku;
+	ke=6.0/20;
+//	kec=6.0/
+	temp_p=data_ROLL_angle_pid.p;
+	temp_d=data_ROLL_angle_pid.d;
+	
+	
+}
+void getmax(void)
+{
+
+	if(AngleCalculate[2]<0)
+	{
+		if(maxen>AngleCalculate[2])
+			maxen=AngleCalculate[2];
+	}
+	else
+	{
+		if(maxep<AngleCalculate[2])
+			maxep=AngleCalculate[2];
+	}
+	if(AngleCalculate[3]<0)
+	{
+		if(maxecn>AngleCalculate[3])
+			maxecn=AngleCalculate[3];
+	}
+	else
+	{
+		if(maxecp<AngleCalculate[3])
+			maxecp=AngleCalculate[3];
+	}
+//	LCD_PrintoutInt(0, 0, maxep);
+//	LCD_PrintoutInt(64, 0, maxen);
+//	LCD_PrintoutInt(0,4,maxecp);
+//	LCD_PrintoutInt(64,4,maxecn);
+}
+
+
+
 /*-----------------------------------------------------------------------*/
 /* 左右平衡控制     by-LZY                                                        */
 /*-----------------------------------------------------------------------*/
@@ -354,28 +399,28 @@ void BalanceControl(void)
 	float temp_angle_balance, temp_anglespeed_balance;
 	static float currentanglespeed_balance, lastanglespeed_balance=0;
 	float last_angle_balance=0;
-	float temp_p,temp_d;
+
 	//angle_calculate();
 	g_fCarAngle_balance= AngleCalculate[2];
 	g_fGyroscopeAngleSpeed_balance=-AngleCalculate[3];
 	 
 	temp_angle_balance=CarAngleInitial_balance - g_fCarAngle_balance;
 	temp_anglespeed_balance= CarAnglespeedInitial_balance - g_fGyroscopeAngleSpeed_balance;
-	if(g_fCarAngle_balance>7||g_fCarAngle_balance<-7)
-	{
-		temp_d=0;
-		temp_p=400;
-	}
-	else if (g_fCarAngle_balance>2||g_fCarAngle_balance<-2)
-	{
-		temp_p=data_ROLL_angle_pid.p+20;
-		temp_d=data_ROLL_angle_pid.d;
-	}
-	else
-	{
-		temp_p=data_ROLL_angle_pid.p;
-		temp_d=data_ROLL_angle_pid.d;
-	}	
+//	if(g_fCarAngle_balance>7||g_fCarAngle_balance<-7)
+//	{
+//		temp_d=0;
+//		temp_p=400;
+//	}
+//	else if (g_fCarAngle_balance>2||g_fCarAngle_balance<-2)
+//	{
+//		temp_p=data_ROLL_angle_pid.p+20;
+//		temp_d=data_ROLL_angle_pid.d;
+//	}
+//	else
+//	{
+//		temp_p=data_ROLL_angle_pid.p;
+//		temp_d=data_ROLL_angle_pid.d;
+//	}	
 	//	currentanglespeed_balance=g_fCarAngle_balance;
 	//	delta_anglespeed_balance=currentanglespeed_balance-lastanglespeed_balance;
 	//	lastanglespeed_balance=currentanglespeed_balance;

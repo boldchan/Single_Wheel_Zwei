@@ -10,15 +10,15 @@ void main(void)
 	//set_speed_target(0);
 	for(;;)
 	{
-		Read_GYalldata(GY953_Data);
-		//send_data2PC(3,ANGLE_TYPE,GY953_Data);
-		//send_data2PC(3,GYR_TYPE,GY953_Data);
-		delay_ms(5);
+//		Read_GYalldata(GY953_Data);
+//		//send_data2PC(3,ANGLE_TYPE,GY953_Data);
+//		//send_data2PC(3,GYR_TYPE,GY953_Data);
+//		delay_ms(5);
 
 		set_key();//按键设置
-		YawControl();
+//		YawControl();
 
-#if 0
+#if 1
 		if (REMOTE_FRAME_STATE_OK == g_remote_frame_state)
 		{
 			g_remote_frame_state = REMOTE_FRAME_STATE_NOK;
@@ -53,6 +53,14 @@ void main(void)
 				LCD_PrintoutInt(0, 4, AngleCalculate[0]);
 				LCD_PrintoutInt(64, 4, AngleCalculate[1]);
 			}
+			if(flagkey3==1)
+			{
+				getmax();
+				LCD_PrintoutInt(0, 0, maxep);
+				LCD_PrintoutInt(64, 0, maxen);
+				LCD_PrintoutInt(0,4,maxecp);
+				LCD_PrintoutInt(64,4,maxecn);
+			}
 			
 //			LCD_PrintoutInt(0, 0, data_ROLL_angle_pid.p);
 //			LCD_PrintoutInt(64, 0, data_ROLL_angle_pid.d);
@@ -84,11 +92,6 @@ void main(void)
 			{
 				set_PropellerA_motor_pwm(-2000);
 				set_PropellerB_motor_pwm(2000);
-			}
-			if(count==3)
-			{
-				set_PropellerA_motor_pwm(-1);
-				set_PropellerB_motor_pwm(-1);
 			}
 //			if(count==3)
 //			{
