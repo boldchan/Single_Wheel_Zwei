@@ -27,6 +27,11 @@
 extern int g_f_pit;
 extern int g_f_enable_speed_control;
 extern int g_f_enable_pwm_control;	/* 启用开环速度控制标志位 */
+extern int g_pit_cnt;//电机控制时间间隔记数
+//转向
+extern int g_turn_start;
+extern int g_turn_state;
+extern float g_fAngleYaw;
 
 
 extern int counter;

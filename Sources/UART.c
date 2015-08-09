@@ -64,6 +64,7 @@ void intc_serial_port_1_RX()
 	BYTE rev_ch;
 	
 	D5=~D5;
+	g_turn_start=1;
 	while(!LINFLEX_1.UARTSR.B.DRF){}
 	rev_ch = (BYTE)LINFLEX_1.BDRM.B.DATA4;
 	g_serial_port_1_f = 1;

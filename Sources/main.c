@@ -4,21 +4,26 @@ BYTE count=0;
 BYTE  SpeedCountFlag=0;
 
 void main(void)
-{
-	uint8_t GY953_Data[41];
+  {
+	int16_t rYAW;//由寄存器读取的YAW
 	init_all_and_POST();
 	//set_speed_target(0);
 	for(;;)
 	{
-//		Read_GYalldata(GY953_Data);
-//		//send_data2PC(3,ANGLE_TYPE,GY953_Data);
-//		//send_data2PC(3,GYR_TYPE,GY953_Data);
-//		delay_ms(5);
-
 		set_key();//按键设置
-//		YawControl();
 
 #if 1
+//		Read_GYalldata(GY953_Data);
+//		rYAW=GY953_Data[24];
+//		rYAW=(rYAW<<8)|GY953_Data[25];
+//		g_fAngleYaw=rYAW/100;
+//		
+//		send_data2PC(3,ANGLE_TYPE,GY953_Data);
+//		LCD_PrintoutFloat(60,7,g_fAngleYaw);
+//		send_data2PC(3,GYR_TYPE,GY953_Data);
+//		YawControl(); //写在pit中断中
+		delay_ms(5);
+		
 		if (REMOTE_FRAME_STATE_OK == g_remote_frame_state)
 		{
 			g_remote_frame_state = REMOTE_FRAME_STATE_NOK;
