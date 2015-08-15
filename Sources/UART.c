@@ -44,6 +44,7 @@ void serial_port_1_TX(unsigned char data)
 	LINFLEX_1.BDRL.B.DATA0=data;	//发送语句
 	while(!LINFLEX_1.UARTSR.B.DTF){}	//等待数据发送完成
 	LINFLEX_1.UARTSR.B.DTF=1;	//清空标志位
+	LINFLEX_1.UARTSR.B.DRF=1;
 	LINFLEX_1.LINIER.B.DRIE=1;	//开中断
 }
 #endif
@@ -64,6 +65,7 @@ void intc_serial_port_1_RX()
 	BYTE rev_ch;
 	
 	D5=~D5;
+	g_turn_start=1;
 	while(!LINFLEX_1.UARTSR.B.DRF){}
 	rev_ch = (BYTE)LINFLEX_1.BDRM.B.DATA4;
 	g_serial_port_1_f = 1;

@@ -129,6 +129,11 @@ void execute_remote_cmd(const BYTE *data)
 int rev_remote_frame_2(BYTE rev)
 {
 	uint8_t num[4]={0};
+	if(rev==0xA5)
+	{
+		g_remote_frame_cnt=0;
+		g_turn_start=1;
+	}
 	if (g_remote_frame_cnt == 0)	//接收帧头
 	{
 		if (rev == 0xA5)
@@ -154,19 +159,12 @@ int rev_remote_frame_2(BYTE rev)
 		{
 			D7=~D7;
 			g_remote_frame_cnt = 0;
-			g_remote_frame_state = REMOTE_FRAME_STATE_OK;	//CheckSum Success
+			g_remote_frame_state = REMOTE_FRAME_STATE_OK;
 		}
 	}
-	LCD_Write_Num(80,1,remote_frame_data[0],5);
-	LCD_Write_Num(80,2,remote_frame_data[1],5);
-	LCD_Write_Num(80,3,remote_frame_data[2],5);
-	switch(remote_frame_data[1])
-	{
-	case 0x57:GY953_Write(0x02,0x15);break;
-	case 0x58:GY953_Write(0x02,0x19);break;
-	case 0x75:Read_Precision(num);generate_remote_frame_2(PREC_TYPE,4,num);break;
-	default:break;
-	}
+//	LCD_Write_Num(80,1,remote_frame_data[0],5);
+//	LCD_Write_Num(80,2,remote_frame_data[1],5);
+//	LCD_Write_Num(80,3,remote_frame_data[2],5);
 	
 	return g_remote_frame_state;
 }
@@ -267,6 +265,29 @@ BYTE check_sum(const BYTE *data, BYTE length)
 	}
 	
 	return (BYTE)res;
+}
+
+void send_acc(float ay,uint8_t X)//X为结束位,发送数据，matlab分析
+{
+	uint8_t ax_H,ax_L,ay_H,ay_L,az_H,az_L;
+	
+//	ax*=1000;
+	ay*=1000;
+//	az*=1000;
+	
+//	ax_L=(int16_t)ax;
+//	ax_H=(int16_t)ax>>8;
+	
+	ay_L=(int16_t)ay;
+	ay_H=(int16_t)ay>>8;
+//	
+//	az_L=az;
+//	az_H=az>>8;
+	
+	serial_port_1_TX(ay_H);
+	serial_port_1_TX(ay_L);
+	serial_port_1_TX(X);
+	D6=~D6;
 }
 
 

@@ -50,6 +50,7 @@
 #define PREC_TYPE (0x75)
 #define RANGE_TYPE (0x85)
 
+
 /* 传感器类型 */
 #define ENC03 (1)
 #define MPU9250 (2)
@@ -88,6 +89,7 @@ extern int rev_remote_frame_2(BYTE rev);
 extern void generate_remote_frame_2(BYTE type, BYTE length, const BYTE data[]);
 extern void send_data2PC(BYTE sensor, BYTE type, BYTE data[]);
 void report_online(void);
+extern void send_acc(float ax,uint8_t X);//X为结束位
 
 
 
