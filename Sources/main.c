@@ -10,11 +10,14 @@ void main(void)
 	float Sax,Say,Saz,Eax,Eay,Eaz;//S:sensor E:earth
 	float q1,q2,q3,q4;//四元数
 	float vy=0,sy=0;//y方向(前进方向)上的速度和距离
-	float deltat=0.016;
-	float xdev,ydev,zdev;
+	float deltat=0.007;
+	float axdev,aydev,azdev;
+	float aymax,aymin,A;//最大值，最小值，幅值
+	int32_t Eay_t;
+	int i=0;
 	init_all_and_POST();
 	//GY953_deviation_adjust_accx(&xdev,&ydev,&zdev);
-
+	delay_ms(25000);
 	for(;;)
 	{
 		D5=0;
@@ -27,26 +30,56 @@ void main(void)
 //		Eax=(2*q1*q1+2*q2*q2-1)*Sax+2*(q2*q3-q1*q4)*Say+2*(q2*q4+q1*q3)*Saz;
 		Eay=2*(q2*q3+q1*q4)*Sax+(2*q1*q1-1+2*q3*q3)*Say+2*(q3*q4-q1*q2)*Saz;
 //		Eaz=2*(q2*q4-q1*q3)*Sax+2*(q3*q4+q1*q2)+Say*(2*q1*q1-1+2*q4*q4)*Saz;
+		if(i==0)
+		{
+			aymax=Eay;
+			aymin=Eay;
+			i++;
+		}
+		if(i<800)
+		{
+			aydev+=Eay;
+			if(Say>aymax)
+				aymax=Eay;
+			if(Say<aymin)
+				aymin=Eay;
+			i++;
+		}
+		else if(i==800)
+		{
+			aydev/=800;
+			A=(aymax-aydev)>(aydev-aymin)?(aymax-aydev):(aydev-aymin);
+			D7=0;//校验完成
+			i++;
+		}
+		else
+		{
+			Eay-=aydev;
+			Eay_t=Eay/(1.2*A);
+			Eay=Eay_t*(1.2*A);
+			vy+=Eay*deltat;
+			sy+=vy*deltat;
+		}
 		send_acc(Eay,0xBB);
-		vy+=Eay*deltat;
-		sy+=vy*deltat;
-		LCD_PrintoutFloat(60,1,Eay);
-		LCD_PrintoutFloat(60,3,vy);
-		LCD_PrintoutFloat(60,5,sy);
+//		LCD_PrintoutFloat(60,1,Eay);
+//		LCD_PrintoutFloat(60,3,vy);
+//		LCD_PrintoutFloat(60,5,sy);
 		D5=1;
-		delay_ms(5);
+		//delay_ms(5);
 #endif
 
 #if 0
-	int16_t ax,ay,az,gx,gy,gz;//g:gyro,a:acc
-	float axf,ayf,azf,gxf,gyf,gzf;
-	uint8_t q0_H,q0_L,q1_H,q1_L,q2_H,q2_L,q3_H,q3_L;
-	int16_t mYaw,mPitch,mRoll;
-	float Angle[6];
+	//int16_t ax,ay,az,gx,gy,gz;//g:gyro,a:acc
+	//float axf,ayf,azf,gxf,gyf,gzf;
+	//uint8_t q0_H,q0_L,q1_H,q1_L,q2_H,q2_L,q3_H,q3_L;
+	//int16_t mYaw,mPitch,mRoll;
+	float Yaw,Pitch,Roll;
+	uint8_t num[4]={0};
+	//float Angle[6];
 	init_all_and_POST();
 	for(;;)
 	{
-		Read_GYalldata(GY953_Data);
+		//Read_GYalldata(GY953_Data);
 //		GY953_READ_ACC_GYRO(&ax,&ay,&az,&gx,&gy,&gz);
 //		axf=ax;ayf=ay;azf=az;gxf=gx;gyf=gy;gzf=gz;
 //		filterUpdate(gxf,gyf,gzf,axf,ayf,azf);
@@ -71,8 +104,38 @@ void main(void)
 //		GY953_Data[31]=q2_L;
 //		GY953_Data[32]=q3_H;
 //		GY953_Data[33]=q3_L;
-		send_data2PC(3,ACC_TYPE,GY953_Data);
-		send_data2PC(3,FOUR_TYPE,GY953_Data);
+//		send_data2PC(3,ACC_TYPE,GY953_Data);
+//		send_data2PC(3,FOUR_TYPE,GY953_Data);
+		if(num[2]==3)
+		{
+			GY953_READ_Angle(&Yaw,&Pitch,&Roll);
+			LCD_PrintoutFloat(60,1,Yaw);
+			LCD_PrintoutFloat(60,3,Pitch);
+			LCD_PrintoutFloat(60,5,Roll);
+		}
+		if(g_remote_frame_state)
+		{
+			switch(remote_frame_data[1])
+			{
+			case 0x57:
+				GY953_Write(0x02,0x15);
+				break;
+			case 0x58:
+				GY953_Write(0x02,0x19);
+                while(num[2]!=3)
+				{
+					Read_Precision(num);
+				}
+				break;
+			case 0x75:
+				Read_Precision(num);
+				generate_remote_frame_2(PREC_TYPE,4,num);
+				break;
+			default:
+				break;
+			}
+			g_remote_frame_state=0;
+		}
 		
 //		mYaw=atan2(2*(SEq_1*SEq_4+SEq_2*SEq_3),1-2*(SEq_3*SEq_3+SEq_4*SEq_4));
 //		mPitch=asin(2*(SEq_1*SEq_3-SEq_2*SEq_4));
@@ -82,12 +145,7 @@ void main(void)
 //		mPitch*=100;
 //		mRoll*=100;
 //		
-//		Angle[1]=mRoll;
-//		Angle[0]=mRoll>>8;
-//		Angle[3]=mPitch;
-//		Angle[2]=mPitch>>8;
-//		Angle[5]=mYaw;
-//		Angle[4]=mYaw>>8;
+
 //		generate_remote_frame_2( ANGLE_TYPE, 6, (const BYTE *)(&Angle[0]));
 		delay_ms(5);
 #endif
