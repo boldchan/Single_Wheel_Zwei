@@ -104,6 +104,7 @@ void main(void)
 //		GY953_Data[31]=q2_L;
 //		GY953_Data[32]=q3_H;
 //		GY953_Data[33]=q3_L;
+
 //		send_data2PC(3,ACC_TYPE,GY953_Data);
 //		send_data2PC(3,FOUR_TYPE,GY953_Data);
 		if(num[2]==3)
@@ -145,7 +146,12 @@ void main(void)
 //		mPitch*=100;
 //		mRoll*=100;
 //		
-
+//		Angle[1]=mRoll;
+//		Angle[0]=mRoll>>8;
+//		Angle[3]=mPitch;
+//		Angle[2]=mPitch>>8;
+//		Angle[5]=mYaw;
+//		Angle[4]=mYaw>>8;
 //		generate_remote_frame_2( ANGLE_TYPE, 6, (const BYTE *)(&Angle[0]));
 		delay_ms(5);
 #endif

@@ -418,7 +418,7 @@ void init_all_and_POST(void)
 	init_serial_port_1();	/* BlueTooth */
 
 	//init_ADC();				/* 陀螺仪读值*/
-	//init_optical_encoder();	/* 光编 */
+	init_optical_encoder();	/* 光编 */
 
 	//init_I2C();
 	//init_choose_mode();		/* 拨码开关模式选择 */
