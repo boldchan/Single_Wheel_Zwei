@@ -54,6 +54,8 @@ typedef unsigned short word;
 #include "GY953.h"
 #include "Bluetooth.h"
 #include "debug.h"
+#include <math.h>
+#include "filter.h"
 
 
 

@@ -4,20 +4,177 @@ BYTE count=0;
 BYTE  SpeedCountFlag=0;
 
 void main(void)
+
 {
-	uint8_t GY953_Data[41];
+ #if 1
+	float Sax,Say,Saz,Eax,Eay,Eaz;//S:sensor E:earth
+	float q1,q2,q3,q4;//四元数
+	float vy=0,sy=0;//y方向(前进方向)上的速度和距离
+	float deltat=0.016;
+	float xdev,ydev,zdev;
+	init_all_and_POST();
+	//GY953_deviation_adjust_accx(&xdev,&ydev,&zdev);
+
+	for(;;)
+	{
+		D5=0;
+		GY953_READ_ACC(&Sax,&Say,&Saz);
+		GY953_READ_Quat(&q1,&q2,&q3,&q4);
+		send_acc(Say,0xAA);
+//		Sax-=xdev;
+//		Say-=ydev;
+//		Saz-=zdev;
+//		Eax=(2*q1*q1+2*q2*q2-1)*Sax+2*(q2*q3-q1*q4)*Say+2*(q2*q4+q1*q3)*Saz;
+		Eay=2*(q2*q3+q1*q4)*Sax+(2*q1*q1-1+2*q3*q3)*Say+2*(q3*q4-q1*q2)*Saz;
+//		Eaz=2*(q2*q4-q1*q3)*Sax+2*(q3*q4+q1*q2)+Say*(2*q1*q1-1+2*q4*q4)*Saz;
+		send_acc(Eay,0xBB);
+		vy+=Eay*deltat;
+		sy+=vy*deltat;
+		LCD_PrintoutFloat(60,1,Eay);
+		LCD_PrintoutFloat(60,3,vy);
+		LCD_PrintoutFloat(60,5,sy);
+		D5=1;
+		delay_ms(5);
+#endif
+
+#if 0
+	int16_t ax,ay,az,gx,gy,gz;//g:gyro,a:acc
+	float axf,ayf,azf,gxf,gyf,gzf;
+	uint8_t q0_H,q0_L,q1_H,q1_L,q2_H,q2_L,q3_H,q3_L;
+	int16_t mYaw,mPitch,mRoll;
+	float Angle[6];
+	init_all_and_POST();
+	for(;;)
+	{
+		Read_GYalldata(GY953_Data);
+//		GY953_READ_ACC_GYRO(&ax,&ay,&az,&gx,&gy,&gz);
+//		axf=ax;ayf=ay;azf=az;gxf=gx;gyf=gy;gzf=gz;
+//		filterUpdate(gxf,gyf,gzf,axf,ayf,azf);
+//		
+//		SEq_1*=10000;
+//		SEq_2*=10000;
+//		SEq_3*=10000;
+//		SEq_4*=10000;
+//		q0_L=(int16_t)SEq_1;
+//		q0_H=(int16_t)SEq_1>>8;
+//		q1_L=(int16_t)SEq_2;
+//		q1_H=(int16_t)SEq_2>>8;
+//		q2_L=(int16_t)SEq_3;
+//		q2_H=(int16_t)SEq_3>>8;
+//		q3_L=(int16_t)SEq_4;
+//		q3_H=(int16_t)SEq_4>>8;
+//		GY953_Data[26]=q0_H;
+//		GY953_Data[27]=q0_L;
+//		GY953_Data[28]=q1_H;
+//		GY953_Data[29]=q1_L;
+//		GY953_Data[30]=q2_H;
+//		GY953_Data[31]=q2_L;
+//		GY953_Data[32]=q3_H;
+//		GY953_Data[33]=q3_L;
+		send_data2PC(3,ACC_TYPE,GY953_Data);
+		send_data2PC(3,FOUR_TYPE,GY953_Data);
+		
+//		mYaw=atan2(2*(SEq_1*SEq_4+SEq_2*SEq_3),1-2*(SEq_3*SEq_3+SEq_4*SEq_4));
+//		mPitch=asin(2*(SEq_1*SEq_3-SEq_2*SEq_4));
+//		mRoll=atan2(2*(SEq_1*SEq_2+SEq_3*SEq_4),1-2*(SEq_2*SEq_2+SEq_3*SEq_3));
+//		
+//		mYaw*=100;
+//		mPitch*=100;
+//		mRoll*=100;
+//		
+//		Angle[1]=mRoll;
+//		Angle[0]=mRoll>>8;
+//		Angle[3]=mPitch;
+//		Angle[2]=mPitch>>8;
+//		Angle[5]=mYaw;
+//		Angle[4]=mYaw>>8;
+//		generate_remote_frame_2( ANGLE_TYPE, 6, (const BYTE *)(&Angle[0]));
+		delay_ms(5);
+#endif
+	
+#if 0
+//	int16_t rYAW;//由寄存器读取的YAW
+	uint8_t num[4]={0};
+	float q0,q1,q2,q3;
+	int16_t mYaw,mPitch,mRoll;
+	float Angle[6];
+	float ax,ay,az,gx,gy,gz;
+	float T32,T31,T33,T12,T22;
+	q0=1;
+	q1=0;
+	q2=0;
+	q3=0;//四元数初始化
 	init_all_and_POST();
 	//set_speed_target(0);
 	for(;;)
 	{
-		Read_GYalldata(GY953_Data);
-		//send_data2PC(3,ANGLE_TYPE,GY953_Data);
-		//send_data2PC(3,GYR_TYPE,GY953_Data);
+		GY953_READ_ACC_GYRO(&ax,&ay,&az,&gx,&gy,&gz);
+		MadgwickAHRSupdateIMU(gx,gy,gz,ax,ay,az,&q0,&q1,&q2,&q3);
+		T32=2*(q2*q3-q0*q1);
+		T31=2*(q1*q3+q2*q2);
+		T33=q0*q0-q1*q1-q2*q2+q3*q3;
+		T12=2*(q1*q3-q0*q2);
+		T22=q0*q0-q1*q1+q2*q2-q3*q3;
+		mPitch=100*asin(T32);
+		mYaw=100*atan(-T31/T33);
+		mRoll=100*atan(T12/T22);
+		Angle[0]=mRoll;
+		Angle[1]=mRoll>>8;
+		Angle[2]=mPitch;
+		Angle[3]=mPitch>>8;
+		Angle[4]=mYaw;
+		Angle[5]=mYaw>>8;
+		generate_remote_frame_2( ANGLE_TYPE, 6, (const BYTE *)(&Angle[0]));
+		delay_ms(2);
+#endif
+		
+#if 0
+		int16_t rYAW;//由寄存器读取的YAW
+		uint8_t num[4]={0};
+		init_all_and_POST();
+		for(;;)
+		{
+
+		if(g_remote_frame_state)
+		{
+			switch(remote_frame_data[1])
+			{
+			case 0x57:
+				GY953_Write(0x02,0x15);
+				break;
+			case 0x58:
+				GY953_Write(0x02,0x19);
+                while(num[2]!=3)
+				{
+					Read_Precision(num);
+				}
+				break;
+			case 0x75:
+				Read_Precision(num);
+				generate_remote_frame_2(PREC_TYPE,4,num);
+				break;
+			default:
+				break;
+			}
+			g_remote_frame_state=0;
+		}
+		if(num[2]==3)                                                                 
+		{
+			Read_GYalldata(GY953_Data);
+			send_data2PC(3,ANGLE_TYPE,GY953_Data);
+			//send_data2PC(3,ACC_TYPE,GY953_Data);
+			//send_data2PC(3,FOUR_TYPE,GY953_Data);
+			rYAW=GY953_Data[24];
+			rYAW=(rYAW<<8)|GY953_Data[25];
+			g_fAngleYaw=rYAW/100;
+			LCD_PrintoutFloat(60,1,g_fAngleYaw);
+		}
+		//set_key();//按键设置
+		//YawControl(); //写在pit中断中
 		delay_ms(5);
-
-		set_key();//按键设置
-		YawControl();
-
+		
+#endif
+		
 #if 0
 		if (REMOTE_FRAME_STATE_OK == g_remote_frame_state)
 		{

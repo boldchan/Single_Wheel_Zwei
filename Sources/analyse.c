@@ -8,6 +8,7 @@
 #define g (9.8)
 #define stime (0.001)		//采样时间 单位s
 
+
 int32_t Data[6];	//陀螺仪，加速度计数据
 
 int32_t xdev;	//零点偏差均值
@@ -234,3 +235,16 @@ float abs(float data)
 		data=0-data;
 	return data;
 }
+
+float invSqrt(float x) {
+	float halfx = 0.5f * x;
+	float y = x;
+	long i = *(long*)&y;
+	i = 0x5f3759df - (i>>1);
+	y = *(float*)&i;
+	y = y * (1.5f - (halfx * y * y));
+	return y;
+}
+
+
+
