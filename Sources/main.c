@@ -15,6 +15,7 @@ void main(void)
 	//GY953_deviation_adjust_accx(&xdev,&ydev,&zdev);
 	GY953_READ_Angle(&yaw,&pitch,&roll);
 	LCD_PrintoutFloat(60,1,pitch);
+
 	for(;;)
 	{
 		D5=0;
@@ -31,6 +32,95 @@ void main(void)
 		//LCD_PrintoutFloat(60,5,sy);
 		D5=1;
 		delay_ms(1);
+	}
+#endif
+
+#if 0
+	//int16_t ax,ay,az,gx,gy,gz;//g:gyro,a:acc
+	//float axf,ayf,azf,gxf,gyf,gzf;
+	//uint8_t q0_H,q0_L,q1_H,q1_L,q2_H,q2_L,q3_H,q3_L;
+	//int16_t mYaw,mPitch,mRoll;
+	float Yaw,Pitch,Roll;
+	uint8_t num[4]={0};
+	//float Angle[6];
+	init_all_and_POST();
+	for(;;)
+	{
+		//Read_GYalldata(GY953_Data);
+//		GY953_READ_ACC_GYRO(&ax,&ay,&az,&gx,&gy,&gz);
+//		axf=ax;ayf=ay;azf=az;gxf=gx;gyf=gy;gzf=gz;
+//		filterUpdate(gxf,gyf,gzf,axf,ayf,azf);
+//		
+//		SEq_1*=10000;
+//		SEq_2*=10000;
+//		SEq_3*=10000;
+//		SEq_4*=10000;
+//		q0_L=(int16_t)SEq_1;
+//		q0_H=(int16_t)SEq_1>>8;
+//		q1_L=(int16_t)SEq_2;
+//		q1_H=(int16_t)SEq_2>>8;
+//		q2_L=(int16_t)SEq_3;
+//		q2_H=(int16_t)SEq_3>>8;
+//		q3_L=(int16_t)SEq_4;
+//		q3_H=(int16_t)SEq_4>>8;
+//		GY953_Data[26]=q0_H;
+//		GY953_Data[27]=q0_L;
+//		GY953_Data[28]=q1_H;
+//		GY953_Data[29]=q1_L;
+//		GY953_Data[30]=q2_H;
+//		GY953_Data[31]=q2_L;
+//		GY953_Data[32]=q3_H;
+//		GY953_Data[33]=q3_L;
+
+//		send_data2PC(3,ACC_TYPE,GY953_Data);
+//		send_data2PC(3,FOUR_TYPE,GY953_Data);
+		if(num[2]==3)
+		{
+			GY953_READ_Angle(&Yaw,&Pitch,&Roll);
+			LCD_PrintoutFloat(60,1,Yaw);
+			LCD_PrintoutFloat(60,3,Pitch);
+			LCD_PrintoutFloat(60,5,Roll);
+		}
+		if(g_remote_frame_state)
+		{
+			switch(remote_frame_data[1])
+			{
+			case 0x57:
+				GY953_Write(0x02,0x15);
+				break;
+			case 0x58:
+				GY953_Write(0x02,0x19);
+                while(num[2]!=3)
+				{
+					Read_Precision(num);
+				}
+				break;
+			case 0x75:
+				Read_Precision(num);
+				generate_remote_frame_2(PREC_TYPE,4,num);
+				break;
+			default:
+				break;
+			}
+			g_remote_frame_state=0;
+		}
+		
+//		mYaw=atan2(2*(SEq_1*SEq_4+SEq_2*SEq_3),1-2*(SEq_3*SEq_3+SEq_4*SEq_4));
+//		mPitch=asin(2*(SEq_1*SEq_3-SEq_2*SEq_4));
+//		mRoll=atan2(2*(SEq_1*SEq_2+SEq_3*SEq_4),1-2*(SEq_2*SEq_2+SEq_3*SEq_3));
+//		
+//		mYaw*=100;
+//		mPitch*=100;
+//		mRoll*=100;
+//		
+//		Angle[1]=mRoll;
+//		Angle[0]=mRoll>>8;
+//		Angle[3]=mPitch;
+//		Angle[2]=mPitch>>8;
+//		Angle[5]=mYaw;
+//		Angle[4]=mYaw>>8;
+//		generate_remote_frame_2( ANGLE_TYPE, 6, (const BYTE *)(&Angle[0]));
+		delay_ms(5);
 	}
 #endif
 	
