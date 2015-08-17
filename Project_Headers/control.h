@@ -38,8 +38,10 @@ extern int counter;
 extern float  angle_pwm;
 extern BYTE speed_period;
 
-
-
+extern float temp_p,temp_d;
+extern float maxep,maxecp;
+extern float maxen,maxecn;
+extern void getmax(void);
 
 /* 时间基准 */
 #ifdef __CONTROL_C_
@@ -131,7 +133,7 @@ struct
 	float p;
 	float i;
 	float d;
-} data_ROLL_angle_pid = { 60, 0, 37 };
+} data_ROLL_angle_pid = { 80, 0, 17 };//原来 p 60 d 37
 #else
 extern struct
 {

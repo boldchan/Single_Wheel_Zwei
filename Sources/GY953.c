@@ -317,3 +317,19 @@ void GY953_deviation_adjust_accx(float *xdev,float *ydev,float *zdev /*, int32_t
 //	*xA=(max-*xdev)>(*xdev-min)?(max-*xdev):(*xdev-min);
 }
 
+int Sframe2Eframe(float *ax,float *ay,float *az)//将传感器平面的加速度通过四元数转换为导航平面内的加速度
+{
+	float Sax,Say,Saz,Eax,Eay,Eaz;//S:sensor E:earth
+	float q1,q2,q3,q4;//四元数
+	GY953_READ_ACC(&Sax,&Say,&Saz);
+	GY953_READ_Quat(&q1,&q2,&q3,&q4);
+	Eax=(2*q1*q1+2*q2*q2-1)*Sax+2*(q2*q3-q1*q4)*Say+2*(q2*q4+q1*q3)*Saz;
+	Eay=2*(q2*q3+q1*q4)*Sax+(2*q1*q1-1+2*q3*q3)*Say+2*(q3*q4-q1*q2)*Saz;
+	Eaz=2*(q2*q4-q1*q3)*Sax+2*(q3*q4+q1*q2)+Say*(2*q1*q1-1+2*q4*q4)*Saz;
+	*ax=Eax;
+	*ay=Eay;
+	*az=Eaz;
+	
+	return 1;
+}
+

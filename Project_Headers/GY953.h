@@ -48,7 +48,7 @@ extern int GY953_READ_ACC(float *ax,float *ay,float *az);
 extern int GY953_READ_Quat(float *q1,float *q2,float *q3,float *q4);
 extern void GY953_deviation_adjust_accx(float *xdev,float *ydev,float *zdev /*, int32_t *xA*/);	
 extern int GY953_READ_Angle(float *yaw,float *pitch,float *roll);
-
+extern int Sframe2Eframe(float *ax,float *ay,float *az);
 
 
 

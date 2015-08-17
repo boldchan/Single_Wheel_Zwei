@@ -35,11 +35,11 @@ void execute_remote_cmd(const BYTE *data)
 		/* 俯仰陀螺仪标定调参 */
 		case CMD_SET_PITCH_ANGLE_ZERO :
 			set_PITCH_angle_zero(*((SWORD *)(&(data[2]))));
-			LCD_PrintoutInt(0, 2, angle_data.PITCH_angle_zero);
+			LCD_PrintoutInt(0, 6, angle_data.PITCH_angle_zero);
 		break;
 		case CMD_SET_PITCH_ANGLE_SPEED_ZERO :
 			set_PITCH_angle_speed_zero(*((SWORD *)(&(data[2]))));
-			LCD_PrintoutInt(64, 2, angle_data.PITCH_anglespeed_zero);
+			LCD_PrintoutInt(64, 6, angle_data.PITCH_anglespeed_zero);
 		break;
 		
 		case CMD_SET_ANGLE_KP :
@@ -84,14 +84,14 @@ void execute_remote_cmd(const BYTE *data)
 		break;
 		
 		case CMD_SET_MOTOR1_KP :
-			set_ROLL_KP(*((SWORD *)(&(data[2]))));
+			set_speed_KP(*((SWORD *)(&(data[2]))));
 //			LCD_PrintoutInt(0, 4, data_ROLL_angle_pid.p);
 		break;
 		case CMD_SET_MOTOR1_KI :
 			set_ROLL_KI(*((SWORD *)(&(data[2]))));
 		break;
 		case CMD_SET_MOTOR1_KD :
-			set_ROLL_KD(*((SWORD *)(&(data[2]))));
+			set_speed_KD(*((SWORD *)(&(data[2]))));
 //			LCD_PrintoutInt(64, 4, data_ROLL_angle_pid.d);
 		break;
 
@@ -100,6 +100,15 @@ void execute_remote_cmd(const BYTE *data)
 		/* 左右平衡电机调参 	*/
 		case CMD_SET_MOTOR2_PWM_TARGET :
 			set_pwm2_target(*((SWORD *)(&(data[2]))));
+		break;
+		case CMD_SET_ROLL_KP :
+			set_ROLL_KP(*((SWORD *)(&(data[2]))));
+		break;
+		case CMD_SET_ROLL_KI :
+			set_ROLL_KI(*((SWORD *)(&(data[2]))));
+		break;
+		case CMD_SET_ROLL_KD :
+			set_ROLL_KD(*((SWORD *)(&(data[2]))));
 		break;
 		
 		/* 航向角电机调参 	*/
@@ -128,6 +137,59 @@ void execute_remote_cmd(const BYTE *data)
 /*-----------------------------------------------------------------------*/
 int rev_remote_frame_2(BYTE rev)
 {
+	if (g_remote_frame_cnt == 0)	//接收帧头
+	{
+		if (rev == 0x5A)
+		{
+			remote_frame_data[g_remote_frame_cnt++] = 0x5A;
+		}
+	}
+	else if (g_remote_frame_cnt == 1)	//接收帧头
+	{
+		if (rev == 0x5A)
+		{
+			remote_frame_data[g_remote_frame_cnt++] = 0x5A;
+		}
+		else
+		{
+			g_remote_frame_cnt = 0;
+		}
+	}
+	else if (g_remote_frame_cnt == 2)	//接收数据类型
+	{
+		remote_frame_data[g_remote_frame_cnt++] = rev;
+	}
+	else if (g_remote_frame_cnt == 3)	//接收长度
+	{
+		remote_frame_data[g_remote_frame_cnt++] = rev;
+
+		if (rev+5>REMOTE_FRAME_LENGTH)	//判断是否会导致缓冲区溢出
+		{
+			g_remote_frame_cnt = 0;
+		}
+	}
+	else if (g_remote_frame_cnt>3 && g_remote_frame_cnt<=remote_frame_data[3]+3)	//接收数据区
+	{
+		remote_frame_data[g_remote_frame_cnt++] = rev;
+	}
+	else if (g_remote_frame_cnt==remote_frame_data[3]+4)	//接收校验字节	
+	{
+		BYTE sum;
+		remote_frame_data[g_remote_frame_cnt++] = rev;
+		sum = check_sum((const BYTE *)(remote_frame_data), (BYTE)(remote_frame_data[3]+4));
+		if (sum != remote_frame_data[remote_frame_data[3]+4])
+		{
+			g_remote_frame_cnt = 0;	//CheckSum Fail
+		}
+		else
+		{
+			g_remote_frame_cnt = 0;
+			g_remote_frame_state = REMOTE_FRAME_STATE_OK;	//CheckSum Success
+		}
+	}
+	
+	return g_remote_frame_state;
+#if 0
 	uint8_t num[4]={0};
 	if(rev==0xA5)
 	{
@@ -167,6 +229,7 @@ int rev_remote_frame_2(BYTE rev)
 //	LCD_Write_Num(80,3,remote_frame_data[2],5);
 	
 	return g_remote_frame_state;
+#endif
 }
 
 

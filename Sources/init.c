@@ -404,20 +404,22 @@ void init_all_and_POST(void)
 	initEMIOS_0MotorAndSteer();
 	
 	/* PIT：光编读值&速度控制 */
-	//init_pit_10ms();
+
+//	init_pit_10ms();
+
 	
 	/* PIT：步进电机控制&角度控制标志位 */
-	//init_pit_1ms();	
+	init_pit_1ms();	
 	
 	
 	//init_Stepmotor();		/* 初始化步进电机 */
 
 	init_led();
 	//init_DIP();				/* 拨码开关 */
-	//init_key();				/* 按键 */
+	init_key();				/* 按键 */
 	init_serial_port_1();	/* BlueTooth */
 
-	//init_ADC();				/* 陀螺仪读值*/
+	init_ADC();				/* 陀螺仪读值*/
 	//init_optical_encoder();	/* 光编 */
 
 	//init_I2C();
@@ -443,7 +445,7 @@ void init_all_and_POST(void)
 //	init_MPU9250();
 	
 	/* 初始化电子罗盘 */
-	init_GY953();
+//	init_GY953();
 
 	/* 读取拨码开关模式号 */
 	//read_DIP_mode();

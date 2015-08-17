@@ -27,6 +27,7 @@ void init_serial_port_1(void)
 	LINFLEX_1.LINIBRR.B.DIV_M= 104; 	//9600
 #endif
 
+
     LINFLEX_1.UARTCR.B.UART=1;
 	LINFLEX_1.UARTCR.R=0x00000033;
 	
