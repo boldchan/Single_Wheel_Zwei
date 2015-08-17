@@ -47,6 +47,8 @@ void set_key(void)
 			flagkey3=1;
 			flagkey4=0;
 			LCD_Fill(0x00);
+			maxep=0;maxecp=0;
+			maxen=0;maxecn=0;
 			/*¹¦ÄÜ´ýÌí¼Ó*/
 		}
 	}

@@ -44,13 +44,16 @@ void execute_remote_cmd(const BYTE *data)
 		
 		case CMD_SET_ANGLE_KP :
 			set_angle_KP(*((SWORD *)(&(data[2]))));
+			LCD_PrintoutInt(0, 6, data_angle_pid.p);
 		break;
 		case CMD_SET_ANGLE_KI :
 			set_angle_KI(*((SWORD *)(&(data[2]))));
 		break;
 		case CMD_SET_ANGLE_KD :
 			set_angle_KD(*((SWORD *)(&(data[2]))));
-		break;
+			data_angle_pid.d/=10.0;
+			LCD_PrintoutInt(0, 6, data_angle_pid.d*10);
+		break;	
 		
 		/* 横滚陀螺仪标定调参 */
 		case CMD_SET_ROLL_ANGLE_ZERO :
@@ -60,15 +63,19 @@ void execute_remote_cmd(const BYTE *data)
 		case CMD_SET_ROLL_ANGLE_SPEED_ZERO :
 			set_ROLL_angle_speed_zero(*((SWORD *)(&(data[2]))));
 			LCD_PrintoutInt(64, 6, angle_data.ROLL_anglespeed_zero);
-
+			
 		break;
 		
 		/* 航向角陀螺仪标定调参 */
 		case CMD_SET_YAW_ANGLE_ZERO :
 			set_YAW_angle_zero(*((SWORD *)(&(data[2]))));
+			yaw_pwm-=10;
+			LCD_PrintoutInt(64, 6, yaw_pwm);
 		break;
 		case CMD_SET_YAW_ANGLE_SPEED_ZERO :
 			set_YAW_angle_speed_zero(*((SWORD *)(&(data[2]))));
+			yaw_pwm+=10;
+			LCD_PrintoutInt(64, 6, yaw_pwm);
 		break;
 		
 		
@@ -78,6 +85,7 @@ void execute_remote_cmd(const BYTE *data)
 		break;
 		case CMD_STOP_SPEED :
 			set_speed_target((SWORD)0);
+			
 		break;
 		case CMD_SET_MOTOR1_PWM_TARGET:
 			set_pwm1_target(*((SWORD *)(&(data[2]))));
@@ -85,14 +93,16 @@ void execute_remote_cmd(const BYTE *data)
 		
 		case CMD_SET_MOTOR1_KP :
 			set_speed_KP(*((SWORD *)(&(data[2]))));
-//			LCD_PrintoutInt(0, 4, data_ROLL_angle_pid.p);
+			//LCD_PrintoutInt(0,6,data_speed_pid.p);
+			LCD_PrintoutInt(0, 4, data_speed_pid.p);
 		break;
 		case CMD_SET_MOTOR1_KI :
-			set_ROLL_KI(*((SWORD *)(&(data[2]))));
+			set_speed_KI(*((SWORD *)(&(data[2]))));
 		break;
 		case CMD_SET_MOTOR1_KD :
 			set_speed_KD(*((SWORD *)(&(data[2]))));
-//			LCD_PrintoutInt(64, 4, data_ROLL_angle_pid.d);
+			data_speed_pid.d/=10.0;
+			LCD_PrintoutInt(64, 4, data_speed_pid.d*10);
 		break;
 
 		
@@ -137,6 +147,7 @@ void execute_remote_cmd(const BYTE *data)
 /*-----------------------------------------------------------------------*/
 int rev_remote_frame_2(BYTE rev)
 {
+	
 	if (g_remote_frame_cnt == 0)	//接收帧头
 	{
 		if (rev == 0x5A)
@@ -183,6 +194,7 @@ int rev_remote_frame_2(BYTE rev)
 		}
 		else
 		{
+			D6=~D6;
 			g_remote_frame_cnt = 0;
 			g_remote_frame_state = REMOTE_FRAME_STATE_OK;	//CheckSum Success
 		}

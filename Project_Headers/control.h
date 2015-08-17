@@ -32,7 +32,7 @@ extern int g_pit_cnt;//电机控制时间间隔记数
 extern int g_turn_start;
 extern int g_turn_state;
 extern float g_fAngleYaw;
-
+extern float yaw_pwm;
 
 extern int counter;
 extern float  angle_pwm;
@@ -100,7 +100,7 @@ struct
 	float p;
 	float i;
 	float d;
-} data_speed_pid = {20 , 0, 2 };// 速度10：p=50，速度20：p=45
+} data_speed_pid = {5 , 0, 2 };// 速度10：p=50，速度20：p=45 速度0：p=5 d=0
 #else
 extern struct
 {
@@ -116,7 +116,7 @@ struct
 	float p;
 	float i;
 	float d;
-} data_angle_pid = { 422, 0, 2 };
+} data_angle_pid = { 450, 0, 1.3 };
 #else
 extern struct
 {
@@ -235,7 +235,7 @@ extern void set_ROLL_KD(float kp);
 extern void YawControl(void);
 
 
-
+extern void test_pwm(void);
 
 extern DWORD diff_time_basis_PIT(const DWORD new_time, const DWORD old_time);
 //extern int abs(int data);

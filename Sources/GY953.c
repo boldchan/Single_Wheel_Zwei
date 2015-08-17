@@ -9,7 +9,7 @@ uint8_t GY953_Data[41];
 void init_GY953(void)
 {
 	GY953_Write(SET_A,0x7D);		//开启磁场计 陀螺仪 加速度计 设置输出速率200HZ
-	GY953_Write(CONTROL_B,0x1D);		//自检 校准 高位置1可恢复出厂设置
+	GY953_Write(CONTROL_B,0x11);		//自检 校准 高位置1可恢复出厂设置
 	GY953_Write(STATE_D,0x0D);		//设置模块精度
 }
 
@@ -151,4 +151,71 @@ int GY953_Write(uint8_t reg,uint8_t Data)
 	
 	return 1;
 }
+int GY953_READ_ACC_GYRO(int16_t *ax,int16_t *ay,int16_t *az,int16_t *gx,int16_t *gy,int16_t *gz)
+{
+	uint8_t ax_H,ax_L,ay_H,ay_L,az_H,az_L,gx_H,gx_L,gy_H,gy_L,gz_H,gz_L;
+	
+	GY953_Read(ACC_X_H,&ax_H);
+	GY953_Read(ACC_X_L,&ax_L);
+	*ax=ax_H;
+	*ax=(*ax<<8)|ax_L;
 
+	
+	GY953_Read(ACC_Y_H,&ay_H);
+	GY953_Read(ACC_Y_L,&ay_L);
+	*ay=ay_H;
+	*ay=(*ay<<8)|ay_L;
+
+	
+	GY953_Read(ACC_Z_H,&az_H);
+	GY953_Read(ACC_Z_L,&az_L);
+	*az=az_H;
+	*az=(*az<<8)|az_L;
+
+
+	GY953_Read(GYRO_X_H,&gx_H);
+	GY953_Read(GYRO_X_L,&gx_L);
+	*gx=gx_H;
+	*gx=(*gx<<8)|gx_L;
+
+	
+	GY953_Read(GYRO_Y_H,&gy_H);
+	GY953_Read(GYRO_Y_L,&gy_L);
+	*gy=gy_H;
+	*gy=(*gy<<8)|gy_L;
+
+	
+	GY953_Read(GYRO_Z_H,&gz_H);
+	GY953_Read(GYRO_Z_L,&gz_L);
+	*gz=gz_H;
+	*gz=(*gz<<8)|gz_L;
+
+	
+	return 1;
+}
+int GY953_READ_Angle(float *yaw,float *pitch,float *roll)
+{
+	uint8_t yaw_H,yaw_L,pitch_H,pitch_L,roll_H,roll_L;
+	int16_t yawt,pitcht,rollt;//中间变量
+	
+	GY953_Read(YAW_H,&yaw_H);
+	GY953_Read(YAW_L,&yaw_L);
+	yawt=yaw_H;
+	yawt=(yawt<<8)|yaw_L;
+	*yaw=yawt/100.0;
+
+	
+	GY953_Read(PITCH_H,&pitch_H);
+	GY953_Read(PITCH_L,&pitch_L);
+	pitcht=pitch_H;
+	pitcht=(pitcht<<8)|pitch_L;
+	*pitch=pitcht/100.0;
+	
+	GY953_Read(ROLL_H,&roll_H);
+	GY953_Read(ROLL_L,&roll_L);
+	rollt=roll_H;
+	rollt=(rollt<<8)|roll_L;
+	*roll=rollt/100.0;
+	
+	return 1;
+}

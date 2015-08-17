@@ -3,15 +3,15 @@
 BYTE count=0;
 BYTE  SpeedCountFlag=0;
 
-void main(void)
-  {
+void main(void)	  {
+	float temp1=0,temp2=0,c1=0;
 	int16_t rYAW;//由寄存器读取的YAW
 	init_all_and_POST();
 	//set_speed_target(0);
 	for(;;)
 	{
 		set_key();//按键设置
-
+		
 #if 1
 //		Read_GYalldata(GY953_Data);
 //		rYAW=GY953_Data[24];
@@ -22,7 +22,7 @@ void main(void)
 //		LCD_PrintoutFloat(60,7,g_fAngleYaw);
 //		send_data2PC(3,GYR_TYPE,GY953_Data);
 //		YawControl(); //写在pit中断中
-		delay_ms(5);
+
 		
 		if (REMOTE_FRAME_STATE_OK == g_remote_frame_state)
 		{
@@ -34,23 +34,17 @@ void main(void)
 		}	
 		if(g_Control)
 		{
-			g_Control=0;
+			D7=1;
 			count++;
-			D6=~D6;	
 			speed_period++;
 			angle_read(AngleResult);
 			angle_calculate();
+
+//			test_pwm();
 #if 1
 			set_speed_pwm();
 			AngleControl();
-			BalanceControl();
-			if(flagkey2==1)
-			{
-				LCD_PrintoutInt(0, 0, AngleResult[2]);
-				LCD_PrintoutInt(64, 0, AngleResult[3]);
-				LCD_PrintoutInt(0, 4, AngleCalculate[2]);
-				LCD_PrintoutInt(64, 4, AngleCalculate[3]);
-			}
+			D5=1;
 			if(flagkey1==1)
 			{
 				LCD_PrintoutInt(0, 0, AngleResult[0]);
@@ -58,15 +52,69 @@ void main(void)
 				LCD_PrintoutInt(0, 4, AngleCalculate[0]);
 				LCD_PrintoutInt(64, 4, AngleCalculate[1]);
 			}
+			if(flagkey2==1)
+			{
+				/*	左右控制	*/
+				BalanceControl();
+				if(AngleCalculate[2]<20&&AngleCalculate[2]>-20)
+				{ 
+					PropellerA_Control();
+					PropellerB_Control();
+				} 
+				else
+				{
+					set_PropellerA_motor_pwm(2000);
+					set_PropellerB_motor_pwm(-2000);
+				}
+				LCD_PrintoutInt(0, 0, AngleResult[2]);
+				LCD_PrintoutInt(64, 0, AngleResult[3]);
+				LCD_PrintoutInt(0, 4, AngleCalculate[2]);
+				LCD_PrintoutInt(64, 4, AngleCalculate[3]);
+			}
 			if(flagkey3==1)
 			{
-				getmax();
-				LCD_PrintoutInt(0, 0, maxep);
-				LCD_PrintoutInt(64, 0, maxen);
-				LCD_PrintoutInt(0,4,maxecp);
-				LCD_PrintoutInt(64,4,maxecn);
+				if(count==3)
+				{
+//					Gy953_angle_read(AngleCalculate);
+					/*	左右控制	*/
+					BalanceControl();
+					if(AngleCalculate[2]<20&&AngleCalculate[2]>-20)
+					{ 
+						PropellerA_Control();
+						PropellerB_Control();
+					} 
+					else
+					{
+						set_PropellerA_motor_pwm(2000);
+						set_PropellerB_motor_pwm(-2000);
+					}
+				}
+//				getmax();
+//				LCD_PrintoutInt(0, 0, maxep);
+//				LCD_PrintoutInt(64, 0, maxen);
+//				LCD_PrintoutInt(0,4,maxecp);
+//				LCD_PrintoutInt(64,4,maxecn);
 			}
-			
+			if(flagkey4==1)
+			{
+//				EMIOS_0.CH[20].CBDR.R = yaw_pwm;
+//				LCD_PrintoutInt(64, 6, yaw_pwm);
+				
+//				Gy953_angle_read(AngleCalculate);
+//				LCD_PrintoutInt(0,0,(AngleCalculate[0]*10.0));
+//				LCD_PrintoutInt(64,0,AngleCalculate[1]);
+//				LCD_PrintoutInt(0,2,(AngleCalculate[2]*10.0));
+//				LCD_PrintoutInt(64,2,AngleCalculate[3]);
+//				LCD_PrintoutInt(0,4,AngleCalculate[4]);
+//				LCD_PrintoutInt(64,4,AngleCalculate[5]);
+//				LCD_PrintoutInt(0,0,data_speed_pid.p);
+//				LCD_PrintoutInt(0,2,data_speed_pid.i);
+//				LCD_PrintoutInt(0,4,data_speed_pid.d);
+//				LCD_PrintoutInt(64,0,data_angle_pid.p);
+//				LCD_PrintoutInt(64,2,data_angle_pid.i);
+//				LCD_PrintoutInt(64,4,data_angle_pid.d*10);
+			}
+			D5=0;
 //			LCD_PrintoutInt(0, 0, data_ROLL_angle_pid.p);
 //			LCD_PrintoutInt(64, 0, data_ROLL_angle_pid.d);
 //			LCD_PrintoutInt(0, 0, data_speed_pid.p);
@@ -77,53 +125,25 @@ void main(void)
 			if(AngleCalculate[0]<20&&AngleCalculate[0]>-20)
 			{ 
 				PITCH_motor_control();
-
 			} 
 			else
 			{
 				set_PITCH_motor_pwm(0);
 			}
 #endif
-//			LCD_PrintoutInt(0, 4, AngleResult[2]);
-//			LCD_PrintoutInt(64, 4, AngleResult[3]);
-			if(AngleCalculate[2]<20&&AngleCalculate[2]>-20)
-			{ 
-				//ROLL_motor_control();
-				PropellerA_Control();
-				PropellerB_Control();
-//				Bangbang_balance_control();
-			} 
-			else
-			{
-				set_PropellerA_motor_pwm(-2000);
-				set_PropellerB_motor_pwm(2000);
-			}
-//			if(count==3)
-//			{
-//				/*	平衡控制	*/ 
-//				if(AngleCalculate[2]<20&&AngleCalculate[2]>-20)
-//				{ 
-//					Balance_Control_HELM();//【大保健看这里：想用上位机调要用WIFI的接收 见For C CUP】
-//				} 
-//				else
-//				{
-//					set_steer_helm_basement(3000);
-//				}
-//			}
-
+			
+			
+			
 			if(count==4)
 			{
+//				Gy953_angle_read(AngleCalculate);
+//				AngleControl();
 				SpeedCountFlag++;
-				get_speed_now();
 				if(SpeedCountFlag>=20) 
 				{
-					set_speed_PID();
+//					set_speed_PID();
 					contorl_speed_encoder_pid();
 					speed_period=0;
-//					LCD_PrintoutInt(0, 4, data_speed_pid.p);
-//					LCD_PrintoutInt(64, 4, data_speed_pid.d);
-//					LCD_PrintoutInt(0, 4, data_speed_settings.speed_target);
-					LCD_PrintoutInt(65, 4, data_encoder1.speed_real);
 					SpeedCountFlag=0;
 				}
 			}
@@ -134,7 +154,8 @@ void main(void)
 //				send_data2PC(ENC03,GYR_TYPE,dall);
 				count=0;
 			}
-
+			g_Control=0;
+			D7=0;
 		}
 
 	#endif

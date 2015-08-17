@@ -44,7 +44,7 @@
 
 
 /* 封装帧数据 */
-#define REMOTE_FRAME_LENGTH (3)//余婧修改
+#define REMOTE_FRAME_LENGTH (24)//余婧修改
 #define REMOTE_FRAME_STATE_OK (1)
 #define REMOTE_FRAME_STATE_NOK (0)
 

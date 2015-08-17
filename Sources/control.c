@@ -31,7 +31,7 @@ float g_fGyroscopeAngleSpeed;
 float g_fGyroscopeTurnSpeed;
 float CarAngleInitial=0;
 float CarAnglespeedInitial=0;
-extern float  AngleCalculate[4];
+extern float  AngleCalculate[6];
 //左右平衡控制全局变量
 float fDelta_balance;
 float g_fCarAngle_balance;
@@ -48,7 +48,7 @@ float EndYawAngle;
 float EndYawAnglespeed=0;
 int g_turn_start=0;
 int g_turn_state=0;
-
+float yaw_pwm=0; //初始电机差速转向，保证偏航角不变
 
 // float AngleControlOutMax=0.2, AngleControlOutMin=-0.2;
 
@@ -190,7 +190,7 @@ void set_PITCH_motor_pwm(int16_t motor_pwm)	//speed_pwm正为向前，负为向�
 		EMIOS_0.CH[21].CBDR.R = 1;
 		EMIOS_0.CH[22].CBDR.R = 1;	
 	}
-	LCD_PrintoutInt(64, 2, motor_pwm);
+//	LCD_PrintoutInt(64, 2, motor_pwm);
 }
 void PITCH_motor_control(void)
 {
@@ -243,24 +243,48 @@ void set_ROLL_motor_pwm(int16_t motor_pwm)	//speed_pwm正为向前，负为向�
 	}
 }
 #endif
+void test_pwm(void)
+{
+	EMIOS_0.CH[19].CBDR.R = 1;//PE3
+	EMIOS_0.CH[20].CBDR.R = 1400;//PE4
+}
 /*----设置螺旋桨电机A MOTOR3 黑白线电机-------*/
 void set_PropellerA_motor_pwm(int16_t motor_pwm)	
 {
 	//使用PE3 PE4
-	motor_pwm=900+motor_pwm;
-	if (motor_pwm>0)	
+	int16_t tempp=0,tempn=0;
+	motor_pwm=900-motor_pwm;
+	tempp=motor_pwm+yaw_pwm;
+	tempn=motor_pwm-yaw_pwm;
+	if (tempp>0&&tempn>0)	
 	{
-		if (motor_pwm>1800)//最高电压7.2V
+		if (tempp>1700)//最高电压7.2V
 		{
-			motor_pwm = 1800;
+			tempp = 1700;
 		}
-//		else if(motor_pwm<250)//死区电压1V
-//		{
-//			motor_pwm=250;
-//		}
-		EMIOS_0.CH[19].CBDR.R = 1;//PE3
-		EMIOS_0.CH[20].CBDR.R = motor_pwm;//PE4
-		
+		else if(tempp<50)
+		{
+			tempp=50;
+		}
+		if (tempn>1700)//最高电压7.2V
+		{
+			tempn = 1700;
+		}
+		else if(tempn<50)
+		{
+			tempn=50;
+		}
+		EMIOS_0.CH[20].CBDR.R = tempp;//PE3
+		EMIOS_0.CH[19].CBDR.R = tempn;//PE4
+//		if(motor_pwm+yaw_pwm>1700)
+//			EMIOS_0.CH[20].CBDR.R = 1700;//PE3
+//		else
+//			EMIOS_0.CH[20].CBDR.R = motor_pwm+yaw_pwm;//PE3
+//
+//		if(motor_pwm-yaw_pwm<1)
+//			EMIOS_0.CH[19].CBDR.R =1;
+//		else
+//			EMIOS_0.CH[19].CBDR.R = motor_pwm-yaw_pwm;//PE4
 	}
 	else 	
 	{
@@ -273,20 +297,36 @@ void set_PropellerA_motor_pwm(int16_t motor_pwm)
 void set_PropellerB_motor_pwm(int16_t motor_pwm)	
 {
 	//暂时使用PE1,PE2
-	motor_pwm=900-motor_pwm;
-	if (motor_pwm>0)	
-	{
-		if (motor_pwm>1800)//最高电压7.2V
+	int16_t tempp=0,tempn=0;
+	motor_pwm=900+motor_pwm;
+	tempp=motor_pwm+yaw_pwm;//p=positive
+	tempn=motor_pwm-yaw_pwm;//n=negative
+	if (tempp>0&&tempn>0)	
+	{   
+		if (tempp>1700)//最高电压7.2V
 		{
-			motor_pwm = 1800;
+			tempp = 1700;
 		}
-//		else if(motor_pwm<250)//死区电压1V
-//		{
-//			motor_pwm=250;
-//		}
-		EMIOS_0.CH[18].CBDR.R = motor_pwm;//PE2
-		EMIOS_0.CH[17].CBDR.R = 1;//PE1
+		else if(tempp<50)
+		{
+			tempp=50;
+		}
+		if (tempn>1700)//最高电压7.2V
+		{
+			tempn = 1700;
+		}
+		else if(tempn<50)
+		{
+			tempn=50;
+		}
+		EMIOS_0.CH[18].CBDR.R =tempp;//PE2
+		EMIOS_0.CH[17].CBDR.R =tempn;//PE1
 		
+//		EMIOS_0.CH[18].CBDR.R = motor_pwm+yaw_pwm;//PE2
+//		if(motor_pwm-yaw_pwm<0)
+//			EMIOS_0.CH[17].CBDR.R =0;
+//		else
+//			EMIOS_0.CH[17].CBDR.R = motor_pwm-yaw_pwm;//PE1
 	}
 	else 	
 	{
@@ -363,7 +403,7 @@ void AngleControl(void)
    float last_angle=0;
    //angle_calculate();
    g_fCarAngle= AngleCalculate[0];
-   g_fGyroscopeAngleSpeed= -AngleCalculate[1];
+   g_fGyroscopeAngleSpeed= AngleCalculate[1];
  // g_fGyroscopeTurnSpeed= AngleCalculateResult[2];
  
    temp_angle=CarAngleInitial - g_fCarAngle;
@@ -394,11 +434,104 @@ void AngleControl(void)
 
 void Fuzzypid_Control(void)
 {
-	float ke,kec,ku;
-	ke=6.0/20;
-//	kec=6.0/
-	temp_p=data_ROLL_angle_pid.p;
-	temp_d=data_ROLL_angle_pid.d;
+	float ke,kec,kup,kud;
+	float e,ec;
+	int E,EC,UKP,UKD;
+	float delta_kp;
+	float delta_kd;
+	static int FuzzyTable_delta_kp[13][13]={              //kp v1.2
+		   { 6, 6, 5, 5, 4, 4, 3, 3, 2, 2, 0, 0,-1},
+		   { 6, 6, 5, 5, 4, 4, 3, 3, 2, 2, 0, 0,-1},
+		   { 5, 5, 5, 5, 4, 4, 2, 2, 1, 1, 0, 0,-1},
+		   { 5, 5, 5, 5, 4, 4, 2, 2, 1, 1, 0, 0,-1},
+		   { 4, 4, 4, 4, 3, 3, 2, 2, 1, 1, 1, 1, 1},
+		   { 4, 4, 4, 4, 3, 3, 2, 2, 1, 1, 1, 1, 1},
+		   { 1, 1, 1, 1, 1, 1, 2, 2, 1, 1, 1, 1, 1},
+		   { 1, 1, 1, 1, 1, 1, 2, 2, 1, 1, 1, 1, 1},
+		   { 1, 1, 1, 1, 1, 1, 2, 2, 3, 3, 4, 4, 4},
+		   { 1, 1, 1, 1, 1, 1, 2, 2, 3, 3, 4, 4, 4},
+		   {-1,-1, 0, 0, 1, 1, 2, 2, 4, 4, 5, 5, 5},
+		   {-1,-1, 0, 0, 1, 1, 2, 2, 4, 4, 5, 5, 5},
+		   {-1,-1, 0, 0, 2, 2, 3, 3, 4, 4, 5, 5, 6}};
+//	int FuzzyTable_delta_kp[13][13]={              //kp v1.1
+//			{ 6, 6, 5, 5, 4, 4, 3, 3, 2, 2, 0, 0,-1},
+//		    { 6, 6, 5, 5, 4, 4, 3, 3, 2, 2, 0, 0,-1},
+//		    { 5, 5, 5, 5, 4, 4, 2, 2, 1, 1, 0, 0,-1},
+//		    { 5, 5, 5, 5, 4, 4, 2, 2, 1, 1, 0, 0,-1},
+//		    { 4, 4, 4, 4, 3, 3, 1, 1,-1,-1,-1,-1,-2},
+//		    { 4, 4, 4, 4, 3, 3, 1, 1,-1,-1,-1,-1,-2},
+//		    { 3, 3, 2, 2, 1, 1, 1, 1,-1,-1,-2,-2,-3},
+//		    { 3, 3, 2, 2, 1, 1, 1, 1,-1,-1,-2,-2,-3},
+//		    { 2, 2, 1, 1, 0, 0,-1,-1,-2,-2,-4,-4,-4},
+//		    { 2, 2, 1, 1, 0, 0,-1,-1,-2,-2,-4,-4,-4},
+//		    { 1, 1,-1,-1,-1,-1,-2,-2,-4,-4,-4,-4,-5},
+//		    { 1, 1,-1,-1,-1,-1,-2,-2,-4,-4,-4,-4,-5},
+//		    { 1, 1,-1,-1,-2,-2,-3,-3,-4,-4,-5,-5,-5}};
+//	int FuzzyTable_delta_kd[13][13]={ 
+//			{ 0, 0,-1,-1,-4,-4,-5,-5,-4,-4,-2,-2,-1},
+//			{ 0, 0,-1,-1,-4,-4,-5,-5,-4,-4,-2,-2,-1},
+//			{ 0, 0,-2,-2,-4,-4,-4,-4,-4,-4,-2,-2,-1},
+//			{ 0, 0,-2,-2,-4,-4,-4,-4,-4,-4,-2,-2,-1},
+//			{ 0, 0,-2,-2,-4,-4,-4,-4,-3,-3,-2,-2,-1},
+//			{ 0, 0,-2,-2,-4,-4,-4,-4,-3,-3,-2,-2,-1},
+//			{-1,-1,-2,-2,-2,-2,-2,-2,-2,-2,-1,-1,-1},
+//			{-1,-1,-2,-2,-2,-2,-2,-2,-2,-2,-1,-1,-1},
+//			{ 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 1, 1, 1},
+//			{ 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 1, 1, 1},
+//			{ 2, 2, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 3},
+//			{ 2, 2, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 3},
+//			{ 2, 2, 2, 2, 1, 1, 3, 3, 3, 3, 3, 3, 4}};
+//	int FuzzyTable_delta_kd[13][13]={                 //kd v1.1
+//		     {  4, 4, 4, 4, 2, 2,-1,-1,-2,-2,-2,-2,-1},
+//		     {  4, 4, 4, 4, 2, 2,-1,-1,-2,-2,-2,-2,-1},
+//		     {  4, 4, 3, 3, 2, 2,-1,-1,-1,-1, 0, 0, 1},
+//		     {  4, 4, 3, 3, 2, 2,-1,-1,-1,-1, 0, 0, 1},
+//		     {  3, 3, 3, 3, 1, 1,-1,-1,-1,-1, 0, 0, 2},
+//		     {  3, 3, 3, 3, 1, 1,-1,-1,-1,-1, 0, 0, 2},
+//		     {  3, 3, 2, 2, 1, 1, 1, 1, 1, 1, 2, 2, 3},
+//		     {  3, 3, 2, 2, 1, 1, 1, 1, 1, 1, 2, 2, 3},
+//		     {  2, 2, 0, 0,-1,-1,-1,-1, 1, 1, 3, 3, 3},
+//		     {  2, 2, 0, 0,-1,-1,-1,-1, 1, 1, 3, 3, 3},
+//		     {  1, 1, 0, 0,-1,-1,-1,-1, 2, 2, 3, 3, 4},
+//		     {  1, 1, 0, 0,-1,-1,-1,-1, 2, 2, 3, 3, 4},
+//		     { -1,-1,-2,-2,-2,-2,-1,-1, 2, 2, 4, 4, 4}};
+	static int FuzzyTable_delta_kd[13][13]={             //kd v1.2
+		{ 4, 4, 4, 4, 0, 0,-2,-2,-3,-3,-2,-2,-1},
+		{ 4, 4, 4, 4, 0, 0,-2,-2,-3,-3,-2,-2,-1},
+		{ 4, 4, 2, 2, 0, 0,-2,-2,-2,-2, 0, 0, 0},
+		{ 4, 4, 2, 2, 0, 0,-2,-2,-2,-2, 0, 0, 0},
+		{ 1, 1, 1, 1,-1,-1,-1,-1,-1,-1, 1, 1, 1},
+		{ 1, 1, 1, 1,-1,-1,-1,-1,-1,-1, 1, 1, 1},
+		{ 1, 1, 1, 1, 0, 0,-1,-1, 0, 0, 1, 1, 1},
+		{ 1, 1, 1, 1, 0, 0,-1,-1, 0, 0, 1, 1, 1},
+		{ 1, 1, 1, 1,-1,-1,-1,-1,-1,-1, 1, 1, 1},
+		{ 1, 1, 1, 1,-1,-1,-1,-1,-1,-1, 1, 1, 1},
+		{ 0, 0, 0, 0,-2,-2,-2,-2, 0, 0, 2, 2, 4},
+		{ 0, 0, 0, 0,-2,-2,-2,-2, 0, 0, 2, 2, 4},
+		{-1,-1,-2,-2,-3,-3,-2,-2, 0, 0, 4, 4, 4}};
+	ke=6.0/7;
+	kec=6.0/150;
+	kup=40.0/6;
+	kud=10.0/6;
+	e=AngleCalculate[2];
+	ec=AngleCalculate[3];
+	E=(int)(ke*(e-0));
+	EC=(int)(kec*(ec-0));
+	if(E>6)
+		E=6;
+	else if (E<-6)
+		E=-6;
+	if(EC>6)
+		EC=6;
+	else if (EC<-6)
+		EC=-6;
+	UKP=FuzzyTable_delta_kp[E+6][EC+6];
+	delta_kp=kup*UKP;
+	UKD=FuzzyTable_delta_kd[E+6][EC+6];
+	delta_kd=kud*UKD;
+	
+	temp_p=data_ROLL_angle_pid.p+delta_kp;
+	temp_d=data_ROLL_angle_pid.d+delta_kd;
 	
 	
 }
@@ -425,10 +558,6 @@ void getmax(void)
 		if(maxecp<AngleCalculate[3])
 			maxecp=AngleCalculate[3];
 	}
-//	LCD_PrintoutInt(0, 0, maxep);
-//	LCD_PrintoutInt(64, 0, maxen);
-//	LCD_PrintoutInt(0,4,maxecp);
-//	LCD_PrintoutInt(64,4,maxecn);
 }
 
 
@@ -443,10 +572,12 @@ void BalanceControl(void)
 	float temp_angle_balance, temp_anglespeed_balance;
 	static float currentanglespeed_balance, lastanglespeed_balance=0;
 	float last_angle_balance=0;
-
+	temp_p=data_ROLL_angle_pid.p;
+	temp_d=data_ROLL_angle_pid.d;
+//	Fuzzypid_Control();
 	//angle_calculate();
 	g_fCarAngle_balance= AngleCalculate[2];
-	g_fGyroscopeAngleSpeed_balance=-AngleCalculate[3];
+	g_fGyroscopeAngleSpeed_balance=AngleCalculate[3];
 	 
 	temp_angle_balance=CarAngleInitial_balance - g_fCarAngle_balance;
 	temp_anglespeed_balance= CarAnglespeedInitial_balance - g_fGyroscopeAngleSpeed_balance;
@@ -474,6 +605,7 @@ void BalanceControl(void)
 	//	delta_angle_balance+=data_speed_pid.d*0.4*delta_anglespeed_balance;	  
 	//angle_pwm_balance=dta_angle;
 	ROLL_angle_pwm=delta_angle_balance;
+	ROLL_angle_pwm=ROLL_angle_pwm/1.3;
 	if(ROLL_angle_pwm>2000)
 	{
 		ROLL_angle_pwm=2000;
@@ -482,7 +614,7 @@ void BalanceControl(void)
 	{
 		ROLL_angle_pwm=-2000;
 	}
-	LCD_PrintoutInt(0, 2, ROLL_angle_pwm);
+//	LCD_PrintoutInt(0, 2, ROLL_angle_pwm);
 }
 
 /*-----------------------------------------------------------------------*/
@@ -666,7 +798,8 @@ void set_speed_PID(void)
 	
 	if(data_speed_settings.speed_target==0)
 	{
-		data_speed_pid.p=20;
+		data_speed_pid.p=5;
+		data_speed_pid.d=0;
 	}
 	else if(data_speed_settings.speed_target<10)
 	{

@@ -4,18 +4,24 @@
 int stepspeed=1000;
 BYTE g_Control;
 int timer=0;
-int ABCD=0;
+int speed_count=0;
 
 void Pit_1ms(void) 
 {
-
+	D6=1;
 	//static int timer=0;
 	//static int ABCD=0;
 	//static int count=0;
 	g_Control=1;
+	speed_count++;
+	if(speed_count==5)
+	{
+		speed_count=0;
+		get_speed_now();
+	}
 	//count++;
 	//stepmotor_rotate();
-	
+#if 0	
 	if(stepspeed>0)
 	{
 		if(timer==stepspeed)
@@ -71,6 +77,7 @@ void Pit_1ms(void)
 		else
 			timer--;
 	}
+#endif
 	/*
 	angle_read(AngleResult_balance); //angleread()暂时使用PB10, PB11，与前后一样
 	set_speed_pwm_balance();
@@ -84,9 +91,10 @@ void Pit_1ms(void)
 		set_motor_pwm(0);
 	*/
 	PIT.CH[2].TFLG.B.TIF = 1;	// MPC56xxB/P/S: Clear PIT 1 flag by writing 1
+	D6=0;
 }
 
-
+#if 0
 void stepmotor_video(int num)
 {
 	//视频用步进电机转动
@@ -235,4 +243,6 @@ void Motor_D(void)
 	SMotor2_C=1;
 	SMotor2_D=0;
 }
+#endif
+
 
