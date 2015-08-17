@@ -10,17 +10,19 @@ void main(void)
 	float Sax,Say,Saz,Eax,Eay,Eaz;//S:sensor E:earth
 	float q1,q2,q3,q4;//四元数
 	float vy=0,sy=0;//y方向(前进方向)上的速度和距离
-	float deltat=0.016;
+	float deltat=0.003;
 	float xdev,ydev,zdev;
+	float pitch,roll,yaw;
 	init_all_and_POST();
 	//GY953_deviation_adjust_accx(&xdev,&ydev,&zdev);
-
+	GY953_READ_Angle(&yaw,&pitch,&roll);
+	LCD_PrintoutFloat(60,1,pitch);
 	for(;;)
 	{
 		D5=0;
 		GY953_READ_ACC(&Sax,&Say,&Saz);
 		GY953_READ_Quat(&q1,&q2,&q3,&q4);
-		send_acc(Say,0xAA);
+		//send_acc(Say,0xAA);
 //		Sax-=xdev;
 //		Say-=ydev;
 //		Saz-=zdev;
@@ -30,11 +32,11 @@ void main(void)
 		send_acc(Eay,0xBB);
 		vy+=Eay*deltat;
 		sy+=vy*deltat;
-		LCD_PrintoutFloat(60,1,Eay);
-		LCD_PrintoutFloat(60,3,vy);
-		LCD_PrintoutFloat(60,5,sy);
+		//LCD_PrintoutFloat(60,1,Eay);
+		//LCD_PrintoutFloat(60,3,vy);
+		//LCD_PrintoutFloat(60,5,sy);
 		D5=1;
-		delay_ms(5);
+		delay_ms(1);
 #endif
 
 #if 0
