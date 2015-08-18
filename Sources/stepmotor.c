@@ -17,6 +17,7 @@ void Pit_1ms(void)
 	if(speed_count==5)
 	{
 		speed_count=0;
+		Gy953_angle_read();
 		get_speed_now();
 	}
 	//count++;

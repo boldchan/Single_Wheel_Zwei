@@ -39,6 +39,9 @@ float g_fGyroscopeAngleSpeed_balance;
 float g_fGyroscopeTurnSpeed_balance;
 float CarAngleInitial_balance=0;
 float CarAnglespeedInitial_balance=0;
+//前进方向角度（YAW）变量
+float CarYawInitial;
+float CarYawspeedInitial=0;
 
 //转向控制全局变量
 //float fDelta_balance;
@@ -432,6 +435,7 @@ void AngleControl(void)
   
 }
 
+
 void Fuzzypid_Control(void)
 {
 	float ke,kec,kup,kud;
@@ -618,49 +622,70 @@ void BalanceControl(void)
 }
 
 /*-----------------------------------------------------------------------*/
-/* 转向控制      by TGC                                                        */
+/* 前进方向控制，使用前先对CarYawInitial赋值                                                       */
 /*-----------------------------------------------------------------------*/
-
 void YawControl(void)
 {
-	int i;
-	//float temp_angle, temp_anglespeed;
-	
-  //pid控制	
 	float delta_yaw;
-	
-	//g_fGyroscopeAngleSpeedYaw=AngleCalculate[3];
+	float delta_yawspeed;
+	float temp_yaw, temp_yawspeed;
+	float CarYaw,GyroscopeYawSpeed;
 
-	delta_yaw=data_YAW_angle_pid.p*(EndYawAngle-g_fAngleYaw);
-	//delta_yaw+=data_YAW_angle_pid.d*(EndYawAnglespeed-g_fGyroscopeAngleSpeedYaw);
-	
-	set_YAW_motor_pwm(delta_yaw);
-	
-//	set_YAW_motor_pwm(500);
-//	delay_ms(3000);
-//	set_YAW_motor_pwm(400);
-//	delay_ms(1000);
-//	set_YAW_motor_pwm(300);
-//	delay_ms(1000);
-//	set_YAW_motor_pwm(200);
-//	delay_ms(1000);
-//	set_YAW_motor_pwm(100);
-//	delay_ms(1000);
-//	set_YAW_motor_pwm(0);
-//	delay_ms(1000);
-	
-//	set_YAW_motor_pwm(1000);
-//		delay_ms(1000);
-//	for(i=19;i>=0;i--)
-//	{
-//		int j=i*50;
-//		set_YAW_motor_pwm(j);
-//		delay_ms(500);
-//		
-//	}
-	
-	//set_YAW_motor_pwm(0);	
+	CarYaw= GYRead[4];
+	GyroscopeYawSpeed= GYRead[5];
+ 
+	temp_yaw=CarYawInitial - CarYaw;
+	temp_yawspeed= CarYawspeedInitial - GyroscopeYawSpeed;
+  
+	delta_yaw = data_yaw_pid.p*temp_yaw;
+	delta_yaw+=data_yaw_pid.d*temp_yawspeed;
+
+	yaw_pwm=delta_yaw;
+	  
 }
+/*-----------------------------------------------------------------------*/
+/* 转向控制      by TGC                                                        */
+/*-----------------------------------------------------------------------*/
+//void YawControl(void)
+//{
+//	int i;
+//	//float temp_angle, temp_anglespeed;
+//	
+//  //pid控制	
+//	float delta_yaw;
+//	
+//	//g_fGyroscopeAngleSpeedYaw=AngleCalculate[3];
+//
+//	delta_yaw=data_YAW_angle_pid.p*(EndYawAngle-g_fAngleYaw);
+//	//delta_yaw+=data_YAW_angle_pid.d*(EndYawAnglespeed-g_fGyroscopeAngleSpeedYaw);
+//	
+//	set_YAW_motor_pwm(delta_yaw);
+//	
+////	set_YAW_motor_pwm(500);
+////	delay_ms(3000);
+////	set_YAW_motor_pwm(400);
+////	delay_ms(1000);
+////	set_YAW_motor_pwm(300);
+////	delay_ms(1000);
+////	set_YAW_motor_pwm(200);
+////	delay_ms(1000);
+////	set_YAW_motor_pwm(100);
+////	delay_ms(1000);
+////	set_YAW_motor_pwm(0);
+////	delay_ms(1000);
+//	
+////	set_YAW_motor_pwm(1000);
+////		delay_ms(1000);
+////	for(i=19;i>=0;i--)
+////	{
+////		int j=i*50;
+////		set_YAW_motor_pwm(j);
+////		delay_ms(500);
+////		
+////	}
+//	
+//	//set_YAW_motor_pwm(0);	
+//}
 
 
 

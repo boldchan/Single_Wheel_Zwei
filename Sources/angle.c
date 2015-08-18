@@ -39,9 +39,8 @@ void angle_read(unsigned int *AngleGra)
 
 }
 
-void Gy953_angle_read(float *AngleGra)
+void Gy953_angle_read(void)
 {
-	int i;
 	float angle_yaw,angle_pitch,angle_roll;
 	int16_t anglespeed_yaw,anglespeed_pitch,anglespeed_roll,ax,ay,az;//gx=pitch,gy=roll,gz=yaw
 	GY953_READ_ACC_GYRO(&ax,&ay,&az,&anglespeed_pitch,&anglespeed_roll,&anglespeed_yaw);
@@ -52,9 +51,6 @@ void Gy953_angle_read(float *AngleGra)
 	GYRead[3]=anglespeed_roll;//anglespeed_roll 右倾 正
 	GYRead[4]=angle_yaw;//angle_yaw 俯视逆时针 正 
 	GYRead[5]=anglespeed_yaw;//anglespeed_yaw 俯视逆时针 正
-	
-	for(i=0;i<6;i++)
-		*AngleGra++=GYRead[i]; 
 }
 
 /*-----------------------------------------------------------------------*/

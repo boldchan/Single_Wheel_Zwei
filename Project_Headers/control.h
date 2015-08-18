@@ -42,6 +42,9 @@ extern float temp_p,temp_d;
 extern float maxep,maxecp;
 extern float maxen,maxecn;
 extern void getmax(void);
+/*前进方向全局变量*/
+extern float CarYawInitial;
+extern float CarYawspeedInitial;
 
 /* 时间基准 */
 #ifdef __CONTROL_C_
@@ -125,6 +128,13 @@ extern struct
 	float d;
 } data_angle_pid;
 #endif
+/*前进方向角度控制PID数据*/
+extern struct
+{
+	float p;
+	float i;
+	float d;
+} data_yaw_pid;
 
 /*平衡PID数据*/
 #ifdef __CONTROL_C_
