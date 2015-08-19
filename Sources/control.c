@@ -256,7 +256,7 @@ void set_PropellerA_motor_pwm(int16_t motor_pwm)
 {
 	//使用PE3 PE4
 	int16_t tempp=0,tempn=0;
-	motor_pwm=900-motor_pwm;
+	motor_pwm=800-motor_pwm;
 	tempp=motor_pwm+yaw_pwm;
 	tempn=motor_pwm-yaw_pwm;
 	if (tempp>0&&tempn>0)	
@@ -301,7 +301,7 @@ void set_PropellerB_motor_pwm(int16_t motor_pwm)
 {
 	//暂时使用PE1,PE2
 	int16_t tempp=0,tempn=0;
-	motor_pwm=900+motor_pwm;
+	motor_pwm=800+motor_pwm;
 	tempp=motor_pwm+yaw_pwm;//p=positive
 	tempn=motor_pwm-yaw_pwm;//n=negative
 	if (tempp>0&&tempn>0)	
@@ -513,10 +513,10 @@ void Fuzzypid_Control(void)
 		{ 0, 0, 0, 0,-2,-2,-2,-2, 0, 0, 2, 2, 4},
 		{ 0, 0, 0, 0,-2,-2,-2,-2, 0, 0, 2, 2, 4},
 		{-1,-1,-2,-2,-3,-3,-2,-2, 0, 0, 4, 4, 4}};
-	ke=6.0/7;
-	kec=6.0/150;
-	kup=40.0/6;
-	kud=10.0/6;
+	ke=6.0/7; //角度输入最大值 7
+	kec=6.0/150; //角速度最大值150
+	kup=40.0/6; //delta_kp最大值为40
+	kud=2.0/6; //delta_dp最大值为2
 	e=AngleCalculate[2];
 	ec=AngleCalculate[3];
 	E=(int)(ke*(e-0));
@@ -578,13 +578,12 @@ void BalanceControl(void)
 	float last_angle_balance=0;
 	temp_p=data_ROLL_angle_pid.p;
 	temp_d=data_ROLL_angle_pid.d;
-//	Fuzzypid_Control();
-	//angle_calculate();
+	Fuzzypid_Control();
 	g_fCarAngle_balance= AngleCalculate[2];
 	g_fGyroscopeAngleSpeed_balance=AngleCalculate[3];
 	 
-	temp_angle_balance=CarAngleInitial_balance - g_fCarAngle_balance;
-	temp_anglespeed_balance= CarAnglespeedInitial_balance - g_fGyroscopeAngleSpeed_balance;
+//	temp_angle_balance=CarAngleInitial_balance - g_fCarAngle_balance;
+//	temp_anglespeed_balance= CarAnglespeedInitial_balance - g_fGyroscopeAngleSpeed_balance;
 //	if(g_fCarAngle_balance>7||g_fCarAngle_balance<-7)
 //	{
 //		temp_d=0;
@@ -607,9 +606,9 @@ void BalanceControl(void)
 	delta_angle_balance = temp_p*(CarAngleInitial_balance - g_fCarAngle_balance);
 	delta_angle_balance+=temp_d*(CarAnglespeedInitial_balance - g_fGyroscopeAngleSpeed_balance);
 	//	delta_angle_balance+=data_speed_pid.d*0.4*delta_anglespeed_balance;	  
-	//angle_pwm_balance=dta_angle;
+	//angle_pwm_balance=dta_angle;	
 	ROLL_angle_pwm=delta_angle_balance;
-	ROLL_angle_pwm=ROLL_angle_pwm/1.3;
+	ROLL_angle_pwm=ROLL_angle_pwm/1.33;
 	if(ROLL_angle_pwm>2000)
 	{
 		ROLL_angle_pwm=2000;
@@ -746,38 +745,38 @@ void contorl_speed_encoder_pid(void)
 	int kp,ki,kd;
 	static SWORD error_last=0;
 	static SWORD sum_error=0;
+	static SWORD error_data[10]={0,0,0,0,0,0,0,0,0,0};
+	static SWORD error_count=0;
 	error_last = error;
 	error = data_speed_settings.speed_target - data_encoder1.speed_real;
 	
 
 	old_speed_pwm = new_speed_pwm;
-	kp=(SWORD)(data_speed_pid.p*(error));       //P控制
+	//P控制
+	kp=(SWORD)(data_speed_pid.p*(error));       
 	new_speed_pwm=kp;
-	kd=(SWORD)(data_speed_pid.d*(error-error_last));  //I控制
+	//D控制
+	kd=(SWORD)(data_speed_pid.d*(error-error_last));  
 	new_speed_pwm+=kd;
+	//I控制
+	sum_error-=error_data[error_count];
 	sum_error+=error;
-	if(sum_error>500) sum_error=500;
-	if(sum_error<-500) sum_error=-500;
+	error_data[error_count]=error;
+	error_count=(error_count+1)%10;
+	if(sum_error>200) sum_error=200;
+	if(sum_error<-200) sum_error=-200;
 	ki=(SWORD)(data_speed_pid.i*(sum_error));	
 	new_speed_pwm+=ki;
-	
+	//限幅
 	if(new_speed_pwm>1000)
 		new_speed_pwm=1000;
 	if(new_speed_pwm<-1000)
 		new_speed_pwm=-1000;   //限制pwm变化量
-	
-//	LCD_PrintoutInt(0, 6, error);
-//	LCD_PrintoutInt(0, 0, kp);
-//	LCD_PrintoutInt(0, 2, kd);
-//	LCD_PrintoutInt(0, 4, ki);	
-//	LCD_PrintoutInt(64, 4, sum_error);
-//	LCD_PrintoutInt(65, 6, new_speed_pwm);
 }
 void set_speed_pwm(void)
 {
 	speed_pwm = (d_speed_pwm/100)*(speed_period)+old_speed_pwm;
 	d_speed_pwm = new_speed_pwm - old_speed_pwm;
-//	LCD_PrintoutInt(0, 6, data_encoder.speed_real);
 }
 void set_speed_pwm_balance(void)
 {
@@ -819,21 +818,31 @@ void set_pwm3_target(SWORD speed_pwm)
 /*-----------------------------------------------------------------------*/
 void set_speed_PID(void) 
 { 
-	
-	
 	if(data_speed_settings.speed_target==0)
 	{
-		data_speed_pid.p=5;
-		data_speed_pid.d=0;
+		data_speed_pid.p=100;
+		data_speed_pid.d=2;
 	}
-	else if(data_speed_settings.speed_target<10)
+	if(0&&data_speed_settings.speed_target<15&&data_speed_settings.speed_target>7)
 	{
-		data_speed_pid.p=50;
+		data_speed_pid.p=40;
+		data_speed_pid.d=2;
 	}
-	else if(data_speed_settings.speed_target<20)
-	{
-		data_speed_pid.p=45;
-	}
+	
+	
+//	if(data_speed_settings.speed_target==0)
+//	{
+//		data_speed_pid.p=5;
+//		data_speed_pid.d=0;
+//	}
+//	else if(data_speed_settings.speed_target<10)
+//	{
+//		data_speed_pid.p=50;
+//	}
+//	else if(data_speed_settings.speed_target<20)
+//	{
+//		data_speed_pid.p=45;
+//	}
 	/*int speed_target=data_speed_settings.speed_target;
 	int speed_now=data_speed_settings.speed_target_now;
 	if(speed_target==0)//420 
