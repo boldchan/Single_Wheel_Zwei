@@ -77,7 +77,6 @@ void execute_remote_cmd(const BYTE *data)
 //			yaw_pwm+=10;
 //			LCD_PrintoutInt(64, 6, yaw_pwm);
 		break;
-		case CMD_SET_YAW_KP:
 			
 		
 		/* 驱动轮电机调参 */

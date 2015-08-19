@@ -437,12 +437,8 @@ void AngleControl(void)
   
 }
 
-<<<<<<< HEAD
-void Fuzzypid_Control(float *tp,float *td)
-=======
 
-void Fuzzypid_Control(void)
->>>>>>> origin/master
+void Fuzzypid_Control(float *tp,float *td)
 {
 	float ke,kec,kup,kud;
 	float e,ec;
