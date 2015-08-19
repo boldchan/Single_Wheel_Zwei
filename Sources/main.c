@@ -11,17 +11,8 @@ void main(void)	  {
 	for(;;)
 	{
 		set_key();//按键设置
-		
 #if 1
-//		Read_GYalldata(GY953_Data);
-//		rYAW=GY953_Data[24];
-//		rYAW=(rYAW<<8)|GY953_Data[25];
-//		g_fAngleYaw=rYAW/100;
-//		
-//		send_data2PC(3,ANGLE_TYPE,GY953_Data);
-//		LCD_PrintoutFloat(60,7,g_fAngleYaw);
-//		send_data2PC(3,GYR_TYPE,GY953_Data);
-//		YawControl(); //写在pit中断中
+
 
 		
 		if (REMOTE_FRAME_STATE_OK == g_remote_frame_state)
@@ -39,11 +30,8 @@ void main(void)	  {
 			speed_period++;
 			angle_read(AngleResult);
 			angle_calculate();
-
-//			test_pwm();
-#if 1
-			set_speed_pwm();
-			AngleControl();
+			set_speed_pwm();//前后速度pwm递增
+			AngleControl();//前后角度控制pwm计算
 			D5=1;
 			if(flagkey1==1)
 			{
@@ -56,6 +44,7 @@ void main(void)	  {
 			{
 				/*	左右控制	*/
 				BalanceControl();
+				Propeller_YawControl();
 				if(AngleCalculate[2]<20&&AngleCalculate[2]>-20)
 				{ 
 					PropellerA_Control();
@@ -63,6 +52,7 @@ void main(void)	  {
 				} 
 				else
 				{
+					set_PITCH_motor_pwm(0);
 					set_PropellerA_motor_pwm(2000);
 					set_PropellerB_motor_pwm(-2000);
 				}
@@ -78,6 +68,7 @@ void main(void)	  {
 //					Gy953_angle_read();
 					/*	左右控制	*/
 					BalanceControl();
+					Propeller_YawControl();
 					if(AngleCalculate[2]<20&&AngleCalculate[2]>-20)
 					{ 
 						PropellerA_Control();
@@ -85,6 +76,7 @@ void main(void)	  {
 					} 
 					else
 					{
+						set_PITCH_motor_pwm(0);
 						set_PropellerA_motor_pwm(2000);
 						set_PropellerB_motor_pwm(-2000);
 					}
@@ -97,6 +89,8 @@ void main(void)	  {
 			}
 			if(flagkey4==1)
 			{
+				LCD_PrintoutInt(0, 0, GYRead[4]*10);
+				LCD_PrintoutInt(64, 0, GYRead[5]*10);
 //				EMIOS_0.CH[20].CBDR.R = yaw_pwm;
 //				LCD_PrintoutInt(64, 6, yaw_pwm);			
 //				Gy953_angle_read(AngleCalculate);
@@ -119,25 +113,29 @@ void main(void)	  {
 //			LCD_PrintoutInt(0, 0, data_speed_pid.p);
 //			LCD_PrintoutInt(64, 0, data_speed_pid.d);
 			
-
+			
+			
 			/*	前后控制	*/
 			if(AngleCalculate[0]<20&&AngleCalculate[0]>-20)
 			{ 
-				PITCH_motor_control();
+				PITCH_motor_control();//前后电机控制
 			} 
 			else
 			{
 				set_PITCH_motor_pwm(0);
+				set_PropellerA_motor_pwm(2000);
+				set_PropellerB_motor_pwm(-2000);
 			}
-#endif
+			
+
 			
 			
 			
 			if(count==4)
 			{
 				Gy953_angle_read();
-				LCD_PrintoutInt(0, 0, GYRead[4]*100);
-				LCD_PrintoutInt(64, 0, GYRead[5]*100);
+//				LCD_PrintoutInt(0, 0, GYRead[4]*100);
+//				LCD_PrintoutInt(64, 0, GYRead[5]*100);
 //				AngleControl();
 				SpeedCountFlag++;
 				if(SpeedCountFlag>=20)

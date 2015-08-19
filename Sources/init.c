@@ -484,7 +484,7 @@ void init_DSPI_1(void)
 	SIU.PCR[75].R = 0x0A04;	//PE11 CS4_1	OLED
 
 
-	DSPI_1.RSER.B.TCFRE = 0;	//关闭传输完成中断
+//	DSPI_1.RSER.B.TCFRE = 0;	//关闭传输完成中断
 }
 
 //

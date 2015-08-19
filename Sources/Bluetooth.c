@@ -63,8 +63,21 @@ void execute_remote_cmd(const BYTE *data)
 		case CMD_SET_ROLL_ANGLE_SPEED_ZERO :
 			set_ROLL_angle_speed_zero(*((SWORD *)(&(data[2]))));
 			LCD_PrintoutInt(64, 6, angle_data.ROLL_anglespeed_zero);
-			
 		break;
+		/* 左右平衡电机调参 	*/
+		case CMD_SET_MOTOR2_PWM_TARGET :
+			set_pwm2_target(*((SWORD *)(&(data[2]))));
+		break;
+		case CMD_SET_ROLL_KP :
+			set_ROLL_KP(*((SWORD *)(&(data[2]))));
+		break;
+		case CMD_SET_ROLL_KI :
+			set_ROLL_KI(*((SWORD *)(&(data[2]))));
+		break;
+		case CMD_SET_ROLL_KD :
+			set_ROLL_KD(*((SWORD *)(&(data[2]))));
+		break;
+		
 		
 		/* 航向角陀螺仪标定调参 */
 		case CMD_SET_YAW_ANGLE_ZERO :
@@ -77,6 +90,24 @@ void execute_remote_cmd(const BYTE *data)
 //			yaw_pwm+=10;
 //			LCD_PrintoutInt(64, 6, yaw_pwm);
 		break;
+		/* 航向角电机调参 	*/
+		case CMD_SET_MOTOR3_PWM_TARGET :
+			set_pwm3_target(*((SWORD *)(&(data[2]))));
+		break;
+		/* Yaw PID调参*/
+		case CMD_SET_YAW_KP:
+			set_Yaw_KP(*((SWORD *)(&(data[2]))));
+			LCD_PrintoutInt(64, 6, data_YAW_angle_pid.p);
+		break;
+		case CMD_SET_YAW_KD:
+			set_Yaw_KD(*((SWORD *)(&(data[2]))));
+			LCD_PrintoutInt(64, 6, data_YAW_angle_pid.d);
+		break;
+		case CMD_SET_YAW_KI:
+			set_Yaw_KI(*((SWORD *)(&(data[2]))));
+			LCD_PrintoutInt(64, 6, data_YAW_angle_pid.i);
+		break;
+			
 			
 		
 		/* 驱动轮电机调参 */
@@ -107,32 +138,9 @@ void execute_remote_cmd(const BYTE *data)
 
 		
 		
-		/* 左右平衡电机调参 	*/
-		case CMD_SET_MOTOR2_PWM_TARGET :
-			set_pwm2_target(*((SWORD *)(&(data[2]))));
-		break;
-		case CMD_SET_ROLL_KP :
-			set_ROLL_KP(*((SWORD *)(&(data[2]))));
-		break;
-		case CMD_SET_ROLL_KI :
-			set_ROLL_KI(*((SWORD *)(&(data[2]))));
-		break;
-		case CMD_SET_ROLL_KD :
-			set_ROLL_KD(*((SWORD *)(&(data[2]))));
-		break;
+
 		
-		/* 航向角电机调参 	*/
-		case CMD_SET_MOTOR3_PWM_TARGET :
-			set_pwm3_target(*((SWORD *)(&(data[2]))));
-		break;
-		/* Yaw PID调参*/
-		case CMD_SET_YAW_KP:
-			set_Yaw_KP(*((SWORD *)(&(data[2]))));
-		break;
-		case CMD_SET_YAW_KD:
-			set_Yaw_KD(*((SWORD *)(&(data[2]))));
-		break;
-			
+
 		
 #if 0		
 		/* 保留   用于通信	*/
