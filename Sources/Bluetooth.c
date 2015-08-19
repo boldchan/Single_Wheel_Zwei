@@ -137,6 +137,7 @@ void execute_remote_cmd(const BYTE *data)
 /*-----------------------------------------------------------------------*/
 int rev_remote_frame_2(BYTE rev)
 {
+#if 0
 	if (g_remote_frame_cnt == 0)	//接收帧头
 	{
 		if (rev == 0x5A)
@@ -189,6 +190,8 @@ int rev_remote_frame_2(BYTE rev)
 	}
 	
 	return g_remote_frame_state;
+#endif
+	
 #if 0
 	uint8_t num[4]={0};
 	if(rev==0xA5)
@@ -229,6 +232,47 @@ int rev_remote_frame_2(BYTE rev)
 //	LCD_Write_Num(80,3,remote_frame_data[2],5);
 	
 	return g_remote_frame_state;
+#endif
+#if 1
+		uint8_t num[4]={0};
+		if(rev==0xA5)
+		{
+			g_remote_frame_cnt=0;
+			g_turn_start=1;
+		}
+		if (g_remote_frame_cnt == 0)	//接收帧头
+		{
+			if (rev == 0xA5)
+			{
+				D6=~D6;
+				remote_frame_data[g_remote_frame_cnt++] = 0xA5;
+			}
+		}
+		else if (g_remote_frame_cnt == 1)	//接收命令类型
+		{
+			remote_frame_data[g_remote_frame_cnt++] = rev;
+		}
+		else if (g_remote_frame_cnt == 2)	//接收数据类型
+		{
+			BYTE sum;
+			remote_frame_data[g_remote_frame_cnt++] = rev;
+			sum = check_sum((const BYTE *)(remote_frame_data), 2);
+			if (sum != remote_frame_data[2])
+			{
+				g_remote_frame_cnt = 0;	//CheckSum Fail
+			}
+			else
+			{
+				D7=~D7;
+				g_remote_frame_cnt = 0;
+				g_remote_frame_state = REMOTE_FRAME_STATE_OK;
+			}
+		}
+	//	LCD_Write_Num(80,1,remote_frame_data[0],5);
+	//	LCD_Write_Num(80,2,remote_frame_data[1],5);
+	//	LCD_Write_Num(80,3,remote_frame_data[2],5);
+		
+		return g_remote_frame_state;
 #endif
 }
 

@@ -5,7 +5,7 @@ BYTE  SpeedCountFlag=0;
 
 void main(void)
 {
- #if 1
+ #if 0
 	float Eax,Eay,Eaz;//E:earth
 	float vy=0,sy=0;//y方向(前进方向)上的速度和距离
 	float deltat=0.003;
@@ -161,7 +161,7 @@ void main(void)
 	}
 #endif
 		
-#if 0	//GY953 校准
+#if 1	//GY953 校准
 		int16_t rYAW;//由寄存器读取的YAW
 		uint8_t num[4]={0};
 		init_all_and_POST();
