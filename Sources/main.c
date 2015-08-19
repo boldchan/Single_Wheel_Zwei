@@ -7,7 +7,7 @@ void main(void)	  {
 	float temp1=0,temp2=0,c1=0;
 	int16_t rYAW;//由寄存器读取的YAW
 	init_all_and_POST();
-	//set_speed_target(0);
+//	set_speed_target(0);
 	for(;;)
 	{
 		set_key();//按键设置
@@ -75,7 +75,7 @@ void main(void)	  {
 			{
 				if(count==3)
 				{
-//					Gy953_angle_read(AngleCalculate);
+					Gy953_angle_read();
 					/*	左右控制	*/
 					BalanceControl();
 					if(AngleCalculate[2]<20&&AngleCalculate[2]>-20)
@@ -98,8 +98,7 @@ void main(void)	  {
 			if(flagkey4==1)
 			{
 //				EMIOS_0.CH[20].CBDR.R = yaw_pwm;
-//				LCD_PrintoutInt(64, 6, yaw_pwm);
-				
+//				LCD_PrintoutInt(64, 6, yaw_pwm);			
 //				Gy953_angle_read(AngleCalculate);
 //				LCD_PrintoutInt(0,0,(AngleCalculate[0]*10.0));
 //				LCD_PrintoutInt(64,0,AngleCalculate[1]);
@@ -139,7 +138,7 @@ void main(void)	  {
 //				Gy953_angle_read(AngleCalculate);
 //				AngleControl();
 				SpeedCountFlag++;
-				if(SpeedCountFlag>=20) 
+				if(SpeedCountFlag>=20)
 				{
 //					set_speed_PID();
 					contorl_speed_encoder_pid();

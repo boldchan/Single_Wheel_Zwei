@@ -11,7 +11,7 @@ void set_key(void)
 		delay_us(30);
 		if(key1==0)	
 		{
-			while(!key1);
+			while(!key1){}
 			flagkey1=1;
 			flagkey2=0;
 			flagkey3=0;
@@ -26,7 +26,7 @@ void set_key(void)
 		delay_us(30);
 		if(key2==0)	
 		{
-			while(!key2);
+			while(!key2){}
 			flagkey1=0;
 			flagkey2=1;
 			flagkey3=0;
@@ -41,7 +41,7 @@ void set_key(void)
 		delay_us(30);
 		if(key3==0)	
 		{
-			while(!key3);
+			while(!key3) {}
 			flagkey1=0;
 			flagkey2=0;
 			flagkey3=1;
@@ -58,7 +58,7 @@ void set_key(void)
 		delay_us(30);
 		if(key4==0)	
 		{
-			while(!key4);
+			while(!key4){}
 			flagkey1=0;
 			flagkey2=0;
 			flagkey3=0;
