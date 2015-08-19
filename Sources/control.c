@@ -12,7 +12,7 @@ int update_steer_helm_basement_to_steer_helm(void);
 
 int counter=0;
 
-float temp_p,temp_d;
+
 float maxep=0,maxecp=0;
 float maxen=0,maxecn=0;
 
@@ -48,6 +48,8 @@ float EndYawAngle;
 float EndYawAnglespeed=0;
 int g_turn_start=0;
 int g_turn_state=0;
+
+float yaw_angle_target=0;
 float yaw_pwm=0; //初始电机差速转向，保证偏航角不变
 
 // float AngleControlOutMax=0.2, AngleControlOutMin=-0.2;
@@ -274,8 +276,8 @@ void set_PropellerA_motor_pwm(int16_t motor_pwm)
 		{
 			tempn=50;
 		}
-		EMIOS_0.CH[20].CBDR.R = tempp;//PE3
-		EMIOS_0.CH[19].CBDR.R = tempn;//PE4
+		EMIOS_0.CH[20].CBDR.R = tempn;//PE3
+		EMIOS_0.CH[19].CBDR.R = tempp;//PE4
 //		if(motor_pwm+yaw_pwm>1700)
 //			EMIOS_0.CH[20].CBDR.R = 1700;//PE3
 //		else
@@ -319,8 +321,8 @@ void set_PropellerB_motor_pwm(int16_t motor_pwm)
 		{
 			tempn=50;
 		}
-		EMIOS_0.CH[18].CBDR.R =tempp;//PE2
-		EMIOS_0.CH[17].CBDR.R =tempn;//PE1
+		EMIOS_0.CH[18].CBDR.R =tempn;//PE2
+		EMIOS_0.CH[17].CBDR.R =tempp;//PE1
 		
 //		EMIOS_0.CH[18].CBDR.R = motor_pwm+yaw_pwm;//PE2
 //		if(motor_pwm-yaw_pwm<0)
@@ -432,7 +434,7 @@ void AngleControl(void)
   
 }
 
-void Fuzzypid_Control(void)
+void Fuzzypid_Control(float *tp,float *td)
 {
 	float ke,kec,kup,kud;
 	float e,ec;
@@ -530,8 +532,8 @@ void Fuzzypid_Control(void)
 	UKD=FuzzyTable_delta_kd[E+6][EC+6];
 	delta_kd=kud*UKD;
 	
-	temp_p=data_ROLL_angle_pid.p+delta_kp;
-	temp_d=data_ROLL_angle_pid.d+delta_kd;
+	*tp=data_ROLL_angle_pid.p+delta_kp;
+	*td=data_ROLL_angle_pid.d+delta_kd;
 	
 	
 }
@@ -572,33 +574,13 @@ void BalanceControl(void)
 	float temp_angle_balance, temp_anglespeed_balance;
 	static float currentanglespeed_balance, lastanglespeed_balance=0;
 	float last_angle_balance=0;
+	float temp_p,temp_d;
 	temp_p=data_ROLL_angle_pid.p;
 	temp_d=data_ROLL_angle_pid.d;
-	Fuzzypid_Control();
+	Fuzzypid_Control(&temp_p,&temp_d);
 	g_fCarAngle_balance= AngleCalculate[2];
 	g_fGyroscopeAngleSpeed_balance=AngleCalculate[3];
 	 
-//	temp_angle_balance=CarAngleInitial_balance - g_fCarAngle_balance;
-//	temp_anglespeed_balance= CarAnglespeedInitial_balance - g_fGyroscopeAngleSpeed_balance;
-//	if(g_fCarAngle_balance>7||g_fCarAngle_balance<-7)
-//	{
-//		temp_d=0;
-//		temp_p=400;
-//	}
-//	else if (g_fCarAngle_balance>2||g_fCarAngle_balance<-2)
-//	{
-//		temp_p=data_ROLL_angle_pid.p+20;
-//		temp_d=data_ROLL_angle_pid.d;
-//	}
-//	else
-//	{
-//		temp_p=data_ROLL_angle_pid.p;
-//		temp_d=data_ROLL_angle_pid.d;
-//	}	
-	//	currentanglespeed_balance=g_fCarAngle_balance;
-	//	delta_anglespeed_balance=currentanglespeed_balance-lastanglespeed_balance;
-	//	lastanglespeed_balance=currentanglespeed_balance;
-		  
 	delta_angle_balance = temp_p*(CarAngleInitial_balance - g_fCarAngle_balance);
 	delta_angle_balance+=temp_d*(CarAnglespeedInitial_balance - g_fGyroscopeAngleSpeed_balance);
 	//	delta_angle_balance+=data_speed_pid.d*0.4*delta_anglespeed_balance;	  
@@ -615,6 +597,45 @@ void BalanceControl(void)
 	}
 //	LCD_PrintoutInt(0, 2, ROLL_angle_pwm);
 }
+
+void Propeller_YawControl(void)
+{
+	int error=0;
+	int kp,ki,kd;
+	static SWORD error_last=0;
+	static SWORD sum_error=0;
+	static SWORD error_data[10]={0,0,0,0,0,0,0,0,0,0};
+	static SWORD error_count=0;
+	error_last = error;
+	error = yaw_angle_target-GYRead[4];
+	
+	//P控制
+	kp=(SWORD)(data_YAW_angle_pid.p*(error));       
+	yaw_pwm=kp;
+	//D控制
+	kd=(SWORD)(data_YAW_angle_pid.d*(error-error_last));  
+	yaw_pwm+=kd;
+	//I控制
+	sum_error-=error_data[error_count];
+	sum_error+=error;
+	error_data[error_count]=error;
+	error_count=(error_count+1)%10;
+	if(sum_error>200) sum_error=200;
+	if(sum_error<-200) sum_error=-200;
+	ki=(SWORD)(data_YAW_angle_pid.i*(sum_error));	
+	yaw_pwm+=ki;
+	//限幅
+//	yaw_pwm=-yaw_pwm; //配合螺旋桨程序方向
+	if(yaw_pwm>100)
+		yaw_pwm=100;
+	if(yaw_pwm<-100)
+		yaw_pwm=-100;   //限制pwm变化量
+}
+
+
+
+
+
 
 /*-----------------------------------------------------------------------*/
 /* 转向控制      by TGC                                                        */
@@ -958,6 +979,12 @@ void set_ROLL_KI(float ki)
 void set_ROLL_KD(float kd)
 {
 	data_ROLL_angle_pid.d = kd;
+}
+
+
+void set_yaw_angle_target(float yaw_target)
+{
+	yaw_angle_target=yaw_target;
 }
 /*-----------------------------------------------------------------------*/
 /* 获取两个周期计数的差值，常用故写成函数                               */

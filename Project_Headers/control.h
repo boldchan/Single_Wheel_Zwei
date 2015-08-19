@@ -33,7 +33,7 @@ extern int g_turn_start;
 extern int g_turn_state;
 extern float g_fAngleYaw;
 extern float yaw_pwm;
-
+extern float yaw_angle_target;
 extern int counter;
 extern float  angle_pwm;
 extern BYTE speed_period;
@@ -150,7 +150,7 @@ struct
 	float p;
 	float i;
 	float d;
-} data_YAW_angle_pid = { 60, 0, 37 };
+} data_YAW_angle_pid = { 60, 1, 0.5 };
 #else
 extern struct
 {
@@ -233,7 +233,7 @@ extern void set_ROLL_KI(float kp);
 extern void set_ROLL_KD(float kp);
 
 extern void YawControl(void);
-
+extern void set_yaw_angle_target(float yaw_target);
 
 extern void test_pwm(void);
 

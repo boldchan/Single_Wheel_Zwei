@@ -68,16 +68,17 @@ void execute_remote_cmd(const BYTE *data)
 		
 		/* 航向角陀螺仪标定调参 */
 		case CMD_SET_YAW_ANGLE_ZERO :
-			set_YAW_angle_zero(*((SWORD *)(&(data[2]))));
-			yaw_pwm-=10;
-			LCD_PrintoutInt(64, 6, yaw_pwm);
+			set_yaw_angle_target(*((SWORD *)(&(data[2]))));
+//			yaw_pwm-=10;
+//			LCD_PrintoutInt(64, 6, yaw_pwm);
 		break;
 		case CMD_SET_YAW_ANGLE_SPEED_ZERO :
 			set_YAW_angle_speed_zero(*((SWORD *)(&(data[2]))));
-			yaw_pwm+=10;
-			LCD_PrintoutInt(64, 6, yaw_pwm);
+//			yaw_pwm+=10;
+//			LCD_PrintoutInt(64, 6, yaw_pwm);
 		break;
-		
+		case CMD_SET_YAW_KP:
+			
 		
 		/* 驱动轮电机调参 */
 		case CMD_SET_MOTOR1_TARGET :
