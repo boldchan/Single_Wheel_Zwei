@@ -135,7 +135,9 @@ void main(void)	  {
 			
 			if(count==4)
 			{
-//				Gy953_angle_read(AngleCalculate);
+				Gy953_angle_read();
+				LCD_PrintoutInt(0, 0, GYRead[4]);
+				LCD_PrintoutInt(64, 0, GYRead[5]);
 //				AngleControl();
 				SpeedCountFlag++;
 				if(SpeedCountFlag>=20)
