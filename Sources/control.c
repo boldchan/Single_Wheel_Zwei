@@ -633,8 +633,8 @@ void YawControl(void)
 	CarYaw= GYRead[4];
 	GyroscopeYawSpeed= GYRead[5];
  
-	temp_yaw=CarYawInitial - CarYaw;
-	temp_yawspeed= CarYawspeedInitial - GyroscopeYawSpeed;
+	temp_yaw=CarYawInitial - CarYaw;//temp_yaw>0:右偏
+	temp_yawspeed= CarYawspeedInitial - GyroscopeYawSpeed;//temp_yawspeed>0:顺时针方向的角速度
   
 	delta_yaw = data_yaw_pid.p*temp_yaw;
 	delta_yaw+=data_yaw_pid.d*temp_yawspeed;
