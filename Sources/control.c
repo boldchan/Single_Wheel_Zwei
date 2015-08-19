@@ -515,7 +515,7 @@ void Fuzzypid_Control(void)
 		{-1,-1,-2,-2,-3,-3,-2,-2, 0, 0, 4, 4, 4}};
 	ke=6.0/7; //角度输入最大值 7
 	kec=6.0/150; //角速度最大值150
-	kup=40.0/6; //delta_kp最大值为40
+	kup=25.0/6; //delta_kp最大值为40
 	kud=2.0/6; //delta_dp最大值为2
 	e=AngleCalculate[2];
 	ec=AngleCalculate[3];

@@ -152,7 +152,7 @@ struct
 	float p;
 	float i;
 	float d;
-} data_ROLL_angle_pid = { 40, 0, 0 };//原来 {100, 0, 6} 
+} data_ROLL_angle_pid = { 50, 0, 6 };//原来 {100, 0, 6} 
 #else
 extern struct
 {
