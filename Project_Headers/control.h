@@ -103,7 +103,7 @@ struct
 	float p;
 	float i;
 	float d;
-} data_speed_pid = {5 , 0, 2 };// 速度10：p=50，速度20：p=45 速度0：p=5 d=0
+} data_speed_pid = {40 , 0, 1 };// 速度10：p=40，速度20：p=45 
 #else
 extern struct
 {
@@ -119,7 +119,7 @@ struct
 	float p;
 	float i;
 	float d;
-} data_angle_pid = { 450, 0, 1.3 };
+} data_angle_pid = { 450, 0, 1};
 #else
 extern struct
 {
@@ -152,7 +152,7 @@ struct
 	float p;
 	float i;
 	float d;
-} data_ROLL_angle_pid = { 80, 0, 17 };//原来 p 60 d 37
+} data_ROLL_angle_pid = { 40, 0, 0 };//原来 {100, 0, 6} 
 #else
 extern struct
 {
