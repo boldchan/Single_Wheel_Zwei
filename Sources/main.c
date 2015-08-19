@@ -75,7 +75,10 @@ void main(void)	  {
 			{
 				if(count==3)
 				{
+<<<<<<< HEAD
 //					Gy953_angle_read();
+=======
+>>>>>>> origin/master
 					/*	左右控制	*/
 					BalanceControl();
 					if(AngleCalculate[2]<20&&AngleCalculate[2]>-20)

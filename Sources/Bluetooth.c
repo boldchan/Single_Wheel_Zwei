@@ -126,6 +126,14 @@ void execute_remote_cmd(const BYTE *data)
 		case CMD_SET_MOTOR3_PWM_TARGET :
 			set_pwm3_target(*((SWORD *)(&(data[2]))));
 		break;
+		/* Yaw PID调参*/
+		case CMD_SET_YAW_KP:
+			set_Yaw_KP(*((SWORD *)(&(data[2]))));
+		break;
+		case CMD_SET_YAW_KD:
+			set_Yaw_KD(*((SWORD *)(&(data[2]))));
+		break;
+			
 		
 #if 0		
 		/* 保留   用于通信	*/
