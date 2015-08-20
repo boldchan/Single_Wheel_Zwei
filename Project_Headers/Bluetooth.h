@@ -41,6 +41,9 @@
 /* 上位机控制 */
 #define CMD_START_CONTROL (0x20)/* 开始PC控制 */
 #define CMD_STOP_CONTROL (0x21)	/* 结束PC控制 */
+/*GY953校准*/
+#define CMD_ACC_GYRO_ADJUST (0x57)
+#define CMD_MAG_ADJUST (0x58)
 
 
 /* 封装帧数据 */

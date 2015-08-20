@@ -44,6 +44,8 @@ extern int Read_Precision(BYTE* Data);
 extern int Read_GYalldata(BYTE* Data);
 extern int GY953_READ_ACC_GYRO(int16_t *ax,int16_t *ay,int16_t *az,int16_t *gx,int16_t *gy,int16_t *gz);
 extern int GY953_READ_Angle(float *yaw,float *pitch,float *roll);
+extern int GY953_ACC_GYRO_ADJUST(void);
+extern int GY953_MAG_ADJUST(void);
 
 
 

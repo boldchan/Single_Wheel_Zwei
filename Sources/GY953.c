@@ -219,3 +219,15 @@ int GY953_READ_Angle(float *yaw,float *pitch,float *roll)
 	
 	return 1;
 }
+
+int GY953_ACC_GYRO_ADJUST(void)
+{
+	GY953_Write(CONTROL_B,0x15);		//自检 校准 高位置1可恢复出厂设置
+	return 1;
+}
+
+int GY953_MAG_ADJUST(void)
+{
+	GY953_Write(CONTROL_B,0x19);		//自检 校准 高位置1可恢复出厂设置
+	return 1;
+}

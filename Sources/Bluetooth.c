@@ -17,6 +17,7 @@ SWORD ans=0;
 void execute_remote_cmd(const BYTE *data)
 {
 	BYTE cmd = 0;
+	BYTE num[4]={0};//读取GY953精度
 	
 	cmd = (BYTE)(data[0]);
 	switch (cmd)
@@ -134,6 +135,15 @@ void execute_remote_cmd(const BYTE *data)
 			set_speed_KD(*((SWORD *)(&(data[2]))));
 			data_speed_pid.d/=10.0;
 			LCD_PrintoutInt(64, 4, data_speed_pid.d*10);
+		break;
+		/*GY953校准*/
+		case CMD_ACC_GYRO_ADJUST:
+			GY953_ACC_GYRO_ADJUST();
+		break;
+		case CMD_MAG_ADJUST:
+			GY953_MAG_ADJUST();
+			Read_Precision(num);
+			while(num[2]!=0x03){};
 		break;
 
 		
