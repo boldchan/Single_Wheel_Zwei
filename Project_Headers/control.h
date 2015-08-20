@@ -33,7 +33,6 @@ extern int g_turn_start;
 extern int g_turn_state;
 extern float g_fAngleYaw;
 extern float yaw_pwm;
-extern float yaw_angle_target;
 extern int counter;
 extern float  angle_pwm;
 extern BYTE speed_period;
@@ -219,7 +218,7 @@ extern void set_speed_KD(float kd);
 
 extern void BalanceControl(void);
 extern void Balance_Control_HELM(void);
-extern void set_steer_helm_basement(WORD helmData);
+void Fuzzypid_Control(float *tp,float *td);
 
 extern void set_PropellerA_motor_pwm(int16_t motor_pwm);
 extern void set_PropellerB_motor_pwm(int16_t motor_pwm);

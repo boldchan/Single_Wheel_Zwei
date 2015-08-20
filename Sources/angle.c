@@ -6,7 +6,7 @@ unsigned int ADResult[6]={0}; //模拟量 恒为正
 unsigned int AngleResult[6]={0}; //前后角度
 float AngleCalculate[6]={0};
 float GYRead[6]={0};   //数字陀螺仪
-
+float yaw_angle_target=0;
 
 /*-----------------------------------------------------------------------*/
 /*-----------俯仰陀螺仪模块读值函数-------------*/
@@ -49,11 +49,13 @@ void Gy953_angle_read(void)
 	GYRead[1]=anglespeed_pitch;//anglespeed_pitch 后仰 正
 	GYRead[2]=angle_roll-angle_data.GY_ROLL_angle_zero;//angle_roll 右倾 正
 	GYRead[3]=anglespeed_roll;//anglespeed_roll 右倾 正
-	GYRead[4]=angle_yaw;//angle_yaw 俯视逆时针 正 
-	if(GYRead[4]<0)
-		GYRead[4]+=360;//负值转换为180至360
+	GYRead[4]=angle_yaw;//angle_yaw 俯视逆时针 正 																																																												
 	GYRead[5]=anglespeed_yaw;//anglespeed_yaw 俯视逆时针 正
-
+	LCD_PrintoutInt(0,2,angle_yaw*10);
+	//根据航向目标值 修改航向坐标零点 目标方向为0
+	GYRead[4]=(GYRead[4]-yaw_angle_target);
+	if(GYRead[4]>180) GYRead[4]-=360;
+	if(GYRead[4]<-180) GYRead[4]+=360;
 }
 
 /*-----------------------------------------------------------------------*/

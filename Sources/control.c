@@ -20,12 +20,7 @@ float maxen=0,maxecn=0;
 static float d_speed_pwm=0;
 static float speed_pwm=0;
 extern unsigned char g_nSpeedControlPeriod;
-//平衡控制速度全局变量
-static float d_speed_pwm_balance=0;
-static float speed_pwm_balance=0;
-extern unsigned char g_nSpeedControlPeriod_balance;
 //角度控制全局变量
-float fDelta;
 float g_fCarAngle;
 float g_fGyroscopeAngleSpeed;
 float g_fGyroscopeTurnSpeed;
@@ -33,18 +28,14 @@ float CarAngleInitial=0;
 float CarAnglespeedInitial=0;
 extern float  AngleCalculate[6];
 //左右平衡控制全局变量
-float fDelta_balance;
 float g_fCarAngle_balance;
 float g_fGyroscopeAngleSpeed_balance;
 float g_fGyroscopeTurnSpeed_balance;
 float CarAngleInitial_balance=0;
 float CarAnglespeedInitial_balance=0;
-//前进方向角度（YAW）变量
-float CarYawInitial;
-float CarYawspeedInitial=0;
+
 
 //转向控制全局变量
-//float fDelta_balance;
 float g_fAngleYaw;
 float g_fGyroscopeAngleSpeedYaw;
 float EndYawAngle;
@@ -52,7 +43,7 @@ float EndYawAnglespeed=0;
 int g_turn_start=0;
 int g_turn_state=0;
 
-float yaw_angle_target=0;
+
 float yaw_pwm=0; //初始电机差速转向，保证偏航角不变
 
 // float AngleControlOutMax=0.2, AngleControlOutMin=-0.2;
@@ -66,12 +57,6 @@ static int old_speed_pwm=0;
 BYTE speed_period=0;
 
 
-DWORD tmp_a, tmp_b;
-
-
-/*-----------------------------------------------------------------------*/
-/* 舵机初始化 	                                                                      */
-/*-----------------------------------------------------------------------*/
 
 /*-----------------------------------------------------------------------*/
 /* PIT中断处理函数        10ms                                                         */
@@ -86,9 +71,7 @@ void PitISR(void)
 	}
 	if(g_turn_state==1)
 	{
-		float delta_yaw;
-		
-		
+		float delta_yaw=0;
 		if(g_pit_cnt==0)
 		{
 			delta_yaw=EndYawAngle-g_fAngleYaw;
@@ -400,19 +383,15 @@ void ROLL_motor_control(void)
 /* 前后角度控制                                                             */
 /*-----------------------------------------------------------------------*/
 void AngleControl(void)
-
-{  float delta_angle;
-   float delta_anglespeed;
-   float temp_angle, temp_anglespeed;
-   float currentanglespeed, lastanglespeed=0;
-   float last_angle=0;
-   //angle_calculate();
-   g_fCarAngle= AngleCalculate[0];
-   g_fGyroscopeAngleSpeed= AngleCalculate[1];
- // g_fGyroscopeTurnSpeed= AngleCalculateResult[2];
+{  
+	float delta_angle;
+	float temp_angle, temp_anglespeed;
+	float last_angle=0;
+	g_fCarAngle= AngleCalculate[0];
+	g_fGyroscopeAngleSpeed= AngleCalculate[1];
  
-   temp_angle=CarAngleInitial - g_fCarAngle;
-   temp_anglespeed= CarAnglespeedInitial - g_fGyroscopeAngleSpeed;
+	temp_angle=CarAngleInitial - g_fCarAngle;
+	temp_anglespeed= CarAnglespeedInitial - g_fGyroscopeAngleSpeed;
   
 //   if(temp_angle<-15)
 //	   data_angle_pid.p=150;	//150//100开环
@@ -574,9 +553,6 @@ void getmax(void)
 void BalanceControl(void)
 {
 	float delta_angle_balance;
-	float delta_anglespeed_balance;
-	float temp_angle_balance, temp_anglespeed_balance;
-	static float currentanglespeed_balance, lastanglespeed_balance=0;
 	float last_angle_balance=0;
 	float temp_p,temp_d;
 	temp_p=data_ROLL_angle_pid.p;
@@ -587,8 +563,7 @@ void BalanceControl(void)
 	 
 	delta_angle_balance = temp_p*(CarAngleInitial_balance - g_fCarAngle_balance);
 	delta_angle_balance+=temp_d*(CarAnglespeedInitial_balance - g_fGyroscopeAngleSpeed_balance);
-	//	delta_angle_balance+=data_speed_pid.d*0.4*delta_anglespeed_balance;	  
-	//angle_pwm_balance=dta_angle;	
+
 	ROLL_angle_pwm=delta_angle_balance;
 	ROLL_angle_pwm=ROLL_angle_pwm/1.33;
 	if(ROLL_angle_pwm>2000)
@@ -604,14 +579,14 @@ void BalanceControl(void)
 
 void Propeller_YawControl(void)
 {
-	int error=0;
+	SWORD error=0;
 	int kp,ki,kd;
 	static SWORD error_last=0;
 	static SWORD sum_error=0;
 	static SWORD error_data[10]={0,0,0,0,0,0,0,0,0,0};
 	static SWORD error_count=0;
 	error_last = error;
-	error = yaw_angle_target-GYRead[4];
+	error = 0-GYRead[4];
 	
 	//P控制
 	kp=(SWORD)(data_YAW_angle_pid.p*(error));       
@@ -664,28 +639,6 @@ void Propeller_YawControl(void)
 //	  
 //}
 
-/*-----------------------------------------------------------------------*/
-/* 设置方向舵机位置                                                                */
-/* 对于白色信号线的舵机：                                                       */
-/* 面对舵机轴，占空比增大，舵机逆时针旋转，对我们的车是左舵    */
-/* 对于橙色信号线的舵机：                                                       */
-/* 相反                                                                                  */
-/* 直接方向舵机寄存器                                                             */
-/* 有限幅                                                                               */
-/*-----------------------------------------------------------------------*/
-void set_steer_helm_basement(WORD helmData)
-{
-	if(helmData <= 1000)
-	{
-		helmData = 1000;
-	}
-	else if(helmData >= 6000)
-	{
-		helmData = 6000;
-	}
-	EMIOS_0.CH[9].CBDR.R = helmData;
-}
-
 
 /*-----------------------------------------------------------------------*/
 /* 获得速度偏差                                                                      */
@@ -714,14 +667,14 @@ static SWORD get_e0()
 /*-----------------------------------------------------------------------*/
 void contorl_speed_encoder_pid(void)
 {
-	int error=0;
+	SWORD error=0;
 	int kp,ki,kd;
 	static SWORD error_last=0;
 	static SWORD sum_error=0;
 	static SWORD error_data[10]={0,0,0,0,0,0,0,0,0,0};
 	static SWORD error_count=0;
 	error_last = error;
-	error = data_speed_settings.speed_target - data_encoder1.speed_real;
+	error = data_speed_settings.speed_target - (SWORD)data_encoder1.speed_real;
 	
 
 	old_speed_pwm = new_speed_pwm;
@@ -751,10 +704,7 @@ void set_speed_pwm(void)
 	speed_pwm = (d_speed_pwm/100)*(speed_period)+old_speed_pwm;
 	d_speed_pwm = new_speed_pwm - old_speed_pwm;
 }
-void set_speed_pwm_balance(void)
-{
-	speed_pwm_balance+=(d_speed_pwm_balance/100);
-}
+
 /*-----------------------------------------------------------------------*/
 /* 设置目标速度                                                                      */
 /*-----------------------------------------------------------------------*/
@@ -793,13 +743,13 @@ void set_speed_PID(void)
 { 
 	if(data_speed_settings.speed_target==0)
 	{
-		data_speed_pid.p=100;
-		data_speed_pid.d=2;
+		data_speed_pid.p=60;
+		data_speed_pid.d=1;
 	}
 	if(0&&data_speed_settings.speed_target<15&&data_speed_settings.speed_target>7)
 	{
-		data_speed_pid.p=40;
-		data_speed_pid.d=2;
+		data_speed_pid.p=55;
+		data_speed_pid.d=1;
 	}
 	
 	
