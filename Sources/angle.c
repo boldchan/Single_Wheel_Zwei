@@ -50,6 +50,8 @@ void Gy953_angle_read(void)
 	GYRead[2]=angle_roll-angle_data.GY_ROLL_angle_zero;//angle_roll 右倾 正
 	GYRead[3]=anglespeed_roll;//anglespeed_roll 右倾 正
 	GYRead[4]=angle_yaw;//angle_yaw 俯视逆时针 正 
+	if(GYRead[4]<0)
+		GYRead[4]+=360;//负值转换为180至360
 	GYRead[5]=anglespeed_yaw;//anglespeed_yaw 俯视逆时针 正
 
 }
@@ -73,7 +75,7 @@ void angle_calculate(void)
 void set_PITCH_angle_zero(SWORD zero)
 {
 	angle_data.PITCH_angle_zero = zero;
-	angle_data.GY_PITCH_angle_zero = zero/10;
+	angle_data.GY_PITCH_angle_zero = zero;
 }
 
 void set_PITCH_angle_speed_zero(SWORD zero)

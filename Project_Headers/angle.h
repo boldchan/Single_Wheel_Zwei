@@ -13,7 +13,7 @@ struct
 	SWORD YAW_anglespeed_zero;
 	float GY_PITCH_angle_zero;
 	float GY_ROLL_angle_zero;
-}angle_data = { 2357, 1194, 1554, 2013, 0, 0,-6,0};//{ 1922, 974, 1764, 1132, 0, 0 }
+}angle_data = { 2082, 1611, 1559, 2015, 0, 0,-6,0};//{ 1922, 974, 1764, 1132, 0, 0 }
 
 #else
 extern struct

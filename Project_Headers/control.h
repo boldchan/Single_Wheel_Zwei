@@ -137,7 +137,7 @@ struct
 	float p;
 	float i;
 	float d;
-} data_ROLL_angle_pid = { 50, 0, 6 };//原来 {100, 0, 6} 
+} data_ROLL_angle_pid = { 100, 0, 6 };//三叶小风扇
 #else
 extern struct
 {
@@ -154,7 +154,7 @@ struct
 	float p;
 	float i;
 	float d;
-} data_YAW_angle_pid = { 30, 1, 0.5 };
+} data_YAW_angle_pid = { 0, 0, 0 };
 #else
 extern struct
 {
