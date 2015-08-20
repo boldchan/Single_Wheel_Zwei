@@ -34,7 +34,7 @@ extern float AngleCalculate[6];
 extern unsigned int AngleResult_balance[4];
 extern float AngleCalculate_balance[4];
 extern float GYRead[6];   //Êý×ÖÍÓÂÝÒÇ 
-
+extern float yaw_angle_target;
 extern void Gy953_angle_read(void);
 
 void angle_read(unsigned int *AngleGra);

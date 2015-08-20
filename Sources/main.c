@@ -62,7 +62,8 @@ void main(void)	  {
 				SpeedCountFlag++;
 				if(SpeedCountFlag>=20) 				//达到一百毫秒
 				{
-//					set_speed_PID();				//根据速度设置PID 标定时关闭
+					if(flagkey3)
+						set_speed_PID();				//根据速度设置PID 标定时关闭
 					contorl_speed_encoder_pid(); 	//速度PWM计算
 					speed_period=0;					//速度增量值清零
 					SpeedCountFlag=0;				//100毫秒计数清零
