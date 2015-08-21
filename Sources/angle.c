@@ -51,7 +51,7 @@ void Gy953_angle_read(void)
 	GYRead[3]=anglespeed_roll;//anglespeed_roll 右倾 正
 	GYRead[4]=angle_yaw;//angle_yaw 俯视逆时针 正 																																																												
 	GYRead[5]=anglespeed_yaw;//anglespeed_yaw 俯视逆时针 正
-	LCD_PrintoutInt(0,2,angle_yaw*10);
+//	LCD_PrintoutInt(0,2,angle_yaw*10);
 	//根据航向目标值 修改航向坐标零点 目标方向为0
 	GYRead[4]=(GYRead[4]-yaw_angle_target);
 	if(GYRead[4]>180) GYRead[4]-=360;

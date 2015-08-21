@@ -44,8 +44,8 @@ int g_turn_start=0;
 int g_turn_state=0;
 
 
-float yaw_pwm=0; //初始电机差速转向，保证偏航角不变
-
+float yaw_pwm=0; 
+float yaw_pwm_0=0;	//初始电机差速转向，保证偏航角不变
 // float AngleControlOutMax=0.2, AngleControlOutMin=-0.2;
 
 float  PITCH_angle_pwm;
@@ -262,8 +262,8 @@ void set_PropellerA_motor_pwm(int16_t motor_pwm)
 		{
 			tempn=50;
 		}
-		EMIOS_0.CH[20].CBDR.R = tempn;//PE3
-		EMIOS_0.CH[19].CBDR.R = tempp;//PE4
+		EMIOS_0.CH[20].CBDR.R = tempp;//PE3 yaw负值为俯视顺时针
+		EMIOS_0.CH[19].CBDR.R = tempn;//PE4
 //		if(motor_pwm+yaw_pwm>1700)
 //			EMIOS_0.CH[20].CBDR.R = 1700;//PE3
 //		else
@@ -307,8 +307,8 @@ void set_PropellerB_motor_pwm(int16_t motor_pwm)
 		{
 			tempn=50;
 		}
-		EMIOS_0.CH[18].CBDR.R =tempn;//PE2
-		EMIOS_0.CH[17].CBDR.R =tempp;//PE1
+		EMIOS_0.CH[18].CBDR.R =tempp;//PE2 yaw负值为俯视顺时针
+		EMIOS_0.CH[17].CBDR.R =tempn;//PE1
 		
 //		EMIOS_0.CH[18].CBDR.R = motor_pwm+yaw_pwm;//PE2
 //		if(motor_pwm-yaw_pwm<0)
@@ -494,10 +494,10 @@ void Fuzzypid_Control(float *tp,float *td)
 		{ 0, 0, 0, 0,-2,-2,-2,-2, 0, 0, 2, 2, 4},
 		{ 0, 0, 0, 0,-2,-2,-2,-2, 0, 0, 2, 2, 4},
 		{-1,-1,-2,-2,-3,-3,-2,-2, 0, 0, 4, 4, 4}};
-	ke=6.0/7; //角度输入最大值 7
-	kec=6.0/150; //角速度最大值150
-	kup=25.0/6; //delta_kp最大值为40
-	kud=2.0/6; //delta_dp最大值为2
+	ke=6.0/7; 		//角度输入最大值 7
+	kec=6.0/150;	//角速度最大值150
+	kup=40.0/6; 	//delta_kp最大值为40
+	kud=2.0/6; 		//delta_dp最大值为2
 	e=AngleCalculate[2];
 	ec=AngleCalculate[3];
 	E=(int)(ke*(e-0));
@@ -602,13 +602,13 @@ void Propeller_YawControl(void)
 	if(sum_error>200) sum_error=200;
 	if(sum_error<-200) sum_error=-200;
 	ki=(SWORD)(data_YAW_angle_pid.i*(sum_error));	
-	yaw_pwm+=ki;
-	//限幅
-//	yaw_pwm=-yaw_pwm; //配合螺旋桨程序方向
+	yaw_pwm+=ki;//yaw负值为俯视顺时针
+	//限幅 
 	if(yaw_pwm>100)
 		yaw_pwm=100;
 	if(yaw_pwm<-100)
 		yaw_pwm=-100;   //限制pwm变化量
+	yaw_pwm+=yaw_pwm_0;
 }
 
 

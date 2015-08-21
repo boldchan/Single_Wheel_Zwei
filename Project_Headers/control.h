@@ -33,6 +33,7 @@ extern int g_turn_start;
 extern int g_turn_state;
 extern float g_fAngleYaw;
 extern float yaw_pwm;
+extern float yaw_pwm_0;
 extern int counter;
 extern float  angle_pwm;
 extern BYTE speed_period;
@@ -102,7 +103,7 @@ struct
 	float p;
 	float i;
 	float d;
-} data_speed_pid = {40 , 0, 1 };// 速度10：p=40，速度20：p=45 
+} data_speed_pid = {60 , 0, 1 };// 速度10：p=40，速度20：p=45 
 #else
 extern struct
 {
