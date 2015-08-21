@@ -9,6 +9,7 @@ void main(void)	  {
 	int16_t rYAW;//由寄存器读取的YAW
 	init_all_and_POST();
 	set_speed_target(0);
+	//set_YAW_motor_pwm();新增电机口
 	for(;;)
 	{
 		set_key();//按键设置

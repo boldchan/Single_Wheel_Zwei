@@ -113,38 +113,22 @@ void PitISR(void)
 void get_speed_now()
 {
 	/*	光编1读值	*/
-	data_encoder1.is_forward = SIU.GPDI[48].B.PDI;//PD0
-	data_encoder1.cnt_old = data_encoder1.cnt_new;
-	data_encoder1.cnt_new = (WORD)EMIOS_0.CH[0].CCNTR.R;//PA0
-	if (data_encoder1.cnt_new >= data_encoder1.cnt_old)
-	{
-		data_encoder1.speed_now = data_encoder1.cnt_new - data_encoder1.cnt_old;
-	}
-	else
-	{
-		data_encoder1.speed_now = 0xffff - (data_encoder1.cnt_old - data_encoder1.cnt_new);
-	}
-	if(data_encoder1.is_forward==0) 
-		data_encoder1.speed_real = 0 - data_encoder1.speed_now;
-	else 
-		data_encoder1.speed_real = data_encoder1.speed_now;
-	
-	/*	光编2读值	*/
-	data_encoder2.is_forward = SIU.GPDI[49].B.PDI;//PD1
-	data_encoder2.cnt_old = data_encoder2.cnt_new;
-	data_encoder2.cnt_new = (WORD)EMIOS_0.CH[1].CCNTR.R;//PA1
-	if (data_encoder2.cnt_new >= data_encoder2.cnt_old)
-	{
-		data_encoder2.speed_now = data_encoder2.cnt_new - data_encoder2.cnt_old;
-	}
-	else
-	{
-		data_encoder2.speed_now = 0xffff - (data_encoder2.cnt_old - data_encoder2.cnt_new);
-	}
-	if(data_encoder2.is_forward==0) 
-		data_encoder2.speed_real = 0 - data_encoder2.speed_now;
-	else 
-		data_encoder2.speed_real = data_encoder2.speed_now;
+		data_encoder1.is_forward = SIU.GPDI[57].B.PDI;//PD9
+		data_encoder1.cnt_old = data_encoder1.cnt_new;
+		data_encoder1.cnt_new = (WORD)EMIOS_0.CH[2].CCNTR.R;//PA2
+		if (data_encoder1.cnt_new >= data_encoder1.cnt_old)
+		{
+			data_encoder1.speed_now = data_encoder1.cnt_new - data_encoder1.cnt_old;
+		}
+		else
+		{
+			data_encoder1.speed_now = 0xffff - (data_encoder1.cnt_old - data_encoder1.cnt_new);
+		}
+		if(data_encoder1.is_forward==0) 
+			data_encoder1.speed_real = 0 - data_encoder1.speed_now;
+		else 
+			data_encoder1.speed_real = data_encoder1.speed_now;
+
 }
 /*-----------------------------------------------------------------------*/
 /* 设置俯仰电机PWM                                                                    */
@@ -343,31 +327,31 @@ void PropellerB_Control(void)
 void set_YAW_motor_pwm(int16_t motor_pwm)	//speed_pwm正为向前，负为向后
 {
 	if (motor_pwm>0)	//forward
-	{
-		if (motor_pwm>SPEED_PWM_MAX)
 		{
-			motor_pwm = SPEED_PWM_MAX;
+			if (motor_pwm>SPEED_PWM_MAX)
+			{
+				motor_pwm = SPEED_PWM_MAX;
+			}
+			EMIOS_0.CH[3].CBDR.R = motor_pwm;	//PA3
+			EMIOS_0.CH[4].CBDR.R = 1;			//PA4
+			
 		}
-		EMIOS_0.CH[17].CBDR.R = motor_pwm;
-		EMIOS_0.CH[18].CBDR.R = 1;
-		
-	}
-	else if (motor_pwm<0)	//backward
-	{
-		motor_pwm = 0-motor_pwm;
-		if (motor_pwm>SPEED_PWM_MAX)
+		else if (motor_pwm<0)	//backward
 		{
-			motor_pwm = SPEED_PWM_MAX;
-		}
+			motor_pwm = 0-motor_pwm;
+			if (motor_pwm>SPEED_PWM_MAX)
+			{
+				motor_pwm = SPEED_PWM_MAX;
+			}
 
-		EMIOS_0.CH[17].CBDR.R = 1;
-		EMIOS_0.CH[18].CBDR.R = motor_pwm;	
-	}
-	else
-	{
-		EMIOS_0.CH[17].CBDR.R = 1;
-		EMIOS_0.CH[18].CBDR.R = 1;	
-	}
+			EMIOS_0.CH[3].CBDR.R = 1;
+			EMIOS_0.CH[4].CBDR.R = motor_pwm;	
+		}
+		else
+		{
+			EMIOS_0.CH[3].CBDR.R = 1;
+			EMIOS_0.CH[4].CBDR.R = 1;	
+		}
 }
 #if 0
 void ROLL_motor_control(void)

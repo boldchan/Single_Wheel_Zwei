@@ -64,14 +64,16 @@ typedef unsigned short word;
 #define D6 SIU.GPDO[13].B.PDO
 #define D7 SIU.GPDO[14].B.PDO
 #define D8 SIU.GPDO[15].B.PDO
+#define StopLight_1 SIU.GPDO[16].B.PDO
+#define StopLight_2 SIU.GPDO[17].B.PDO
 #endif
 
 
 /***************DIP*****************/
-#define switch1 !SIU.GPDI[50].R//PD2左
-#define switch2 !SIU.GPDI[51].R//PD3
-#define switch3 !SIU.GPDI[52].R//PD4
-#define switch4 !SIU.GPDI[53].R//PD5右
+#define switch1 SIU.GPDI[48].R
+#define switch2 SIU.GPDI[49].R
+#define switch3 SIU.GPDI[50].R
+#define switch4 SIU.GPDI[51].R
 
 
 #endif
