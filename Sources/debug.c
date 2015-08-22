@@ -12,10 +12,15 @@ void set_key(void)
 		if(key1==0)	
 		{
 			while(!key1){}
-			flagkey1=1;
-			flagkey2=0;
-			flagkey3=0;
-			flagkey4=0;
+			if(flagkey1==0)
+			{
+				flagkey1=1;
+				flagkey2=0;
+				flagkey3=0;
+				flagkey4=0;
+			}
+			else flagkey1++;
+			if(flagkey1>=3) flagkey1=0;
 			LCD_Fill(0x00);
 			/*功能待添加*/
 		}
@@ -63,6 +68,7 @@ void set_key(void)
 			flagkey2=0;
 			flagkey3=0;
 			flagkey4=1;
+			dis_count=0;
 			LCD_Fill(0x00);
 			/*功能待添加*/
 		}

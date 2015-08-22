@@ -43,11 +43,25 @@ void main(void)	  {
 			set_speed_pwm();			//前后速度pwm递增
 			AngleControl();				//前后角度控制pwm计算
 			PITCH_motor_control();		//前后平衡、速度控制 每毫秒控制  *开屏幕时不可开启驱动板
+			
+			if(g_f_dis_count_control==1)
+			{
+				if(dis_count>=Range)
+				{
+					set_speed_target(0);
+					dis_count=0;
+					g_f_dis_count_control=0;
+				}
+				else
+					set_speed_target(20);
+			}
+			
 			if(flagkey4==1||flagkey1==1)				//按键4和按键1不进行左右平衡
 			{
 				set_PropellerA_motor_pwm(2000);
 				set_PropellerB_motor_pwm(-2000);				
 			}
+			
 			if(count==3&&flagkey3==1||flagkey2==1) 	//5毫秒控制一次  按键2（有显示）、按键3（无显示）有效
 			{
 				/*	左右控制	*/
@@ -94,6 +108,11 @@ void key_work(void)
 		LCD_PrintoutInt(0, 4, AngleCalculate[0]);
 		LCD_PrintoutInt(64, 4, AngleCalculate[1]);
 	}
+	if(flagkey1==2)
+	{
+		LCD_PrintoutInt(0, 0, GYRead[4]*10);
+		LCD_PrintoutInt(64, 0, GYRead[5]*10);
+	}
 	if(flagkey2==1)
 	{
 		/*	左右控制	*/
@@ -112,8 +131,9 @@ void key_work(void)
 	}
 	if(flagkey4==1)
 	{
-		LCD_PrintoutInt(0, 0, GYRead[4]*10);
-		LCD_PrintoutInt(64, 0, GYRead[5]*10);
+		LCD_PrintoutInt(0,0,dis_count/10000);			
+		LCD_PrintoutInt(64,0,dis_count%10000);
+		
 //				EMIOS_0.CH[20].CBDR.R = yaw_pwm;
 //				LCD_PrintoutInt(64, 6, yaw_pwm);			
 //				Gy953_angle_read(AngleCalculate);

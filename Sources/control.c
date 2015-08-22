@@ -5,8 +5,9 @@
 int g_f_pit = 0;
 int g_f_enable_mag_steer_control = 0;
 int g_f_enable_speed_control = 0;	/* 启用闭环速度控制标志位 */
-int g_f_enable_pwm_control = 0;	/* 启用开环速度控制标志位 */
-int speed = 0;
+int g_f_enable_pwm_control = 0;		/* 启用开环速度控制标志位 */
+
+
 int g_pit_cnt=0;
 int update_steer_helm_basement_to_steer_helm(void);
 
@@ -15,6 +16,9 @@ int counter=0;
 
 float maxep=0,maxecp=0;
 float maxen=0,maxecn=0;
+//光编距离计数
+int dis_count=0;
+int g_f_dis_count_control = 0; 		/* 启用两米定距离前进标志位 */
 
 //速度控制全局变量
 static float d_speed_pwm=0;
@@ -128,7 +132,10 @@ void get_speed_now()
 		data_encoder1.speed_real = 0 - data_encoder1.speed_now;
 	else 
 		data_encoder1.speed_real = data_encoder1.speed_now;
-	
+	if(flagkey4==1 || g_f_dis_count_control==1) //按键4 手推记步  or 标志位打开自动记步
+	{
+		dis_count+=data_encoder1.speed_real;
+	}
 	/*	光编2读值	*/
 	data_encoder2.is_forward = SIU.GPDI[49].B.PDI;//PD1
 	data_encoder2.cnt_old = data_encoder2.cnt_new;
@@ -145,6 +152,7 @@ void get_speed_now()
 		data_encoder2.speed_real = 0 - data_encoder2.speed_now;
 	else 
 		data_encoder2.speed_real = data_encoder2.speed_now;
+	
 }
 /*-----------------------------------------------------------------------*/
 /* 设置俯仰电机PWM                                                                    */
