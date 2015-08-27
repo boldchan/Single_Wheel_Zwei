@@ -46,8 +46,6 @@ void execute_remote_cmd(const BYTE *data)
 		case CMD_SET_ANGLE_KP :
 			set_angle_KP(*((SWORD *)(&(data[2]))));
 			LCD_PrintoutInt(0, 6, data_angle_pid.p);
-			yaw_pwm_0-=10;
-			LCD_PrintoutInt(64, 6, yaw_pwm_0);
 		break;
 		case CMD_SET_ANGLE_KI :
 			set_angle_KI(*((SWORD *)(&(data[2]))));
@@ -56,8 +54,6 @@ void execute_remote_cmd(const BYTE *data)
 			set_angle_KD(*((SWORD *)(&(data[2]))));
 			data_angle_pid.d/=10.0;
 			LCD_PrintoutInt(0, 6, data_angle_pid.d*10);
-			yaw_pwm_0+=10;
-			LCD_PrintoutInt(64, 6, yaw_pwm_0);
 		break;	
 		
 		/* 横滚陀螺仪标定调参 */
@@ -72,8 +68,6 @@ void execute_remote_cmd(const BYTE *data)
 		/* 左右平衡电机调参 	*/
 		case CMD_SET_MOTOR2_PWM_TARGET :
 			set_pwm2_target(*((SWORD *)(&(data[2]))));
-			g_f_dis_count_control=1;
-			dis_count=0;
 		break;
 		case CMD_SET_ROLL_KP :
 			set_ROLL_KP(*((SWORD *)(&(data[2]))));

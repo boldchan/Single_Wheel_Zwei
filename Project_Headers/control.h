@@ -1,8 +1,7 @@
 ﻿#ifndef __CONTROL_H__
 #define __CONTROL_H__
 
-/*光编距离计数*/
-#define Range (55000)
+
 /* 方向舵机PWM */
 #define STEER_HELM_CENTER (3301)
 #define STEER_HELM_TEST (1500)
@@ -25,16 +24,10 @@
 #define SPEED_ENCODER_MAX (0x0110)
 #define SPEED_ENCODER_TEST (11)
 
-
 extern int g_f_pit;
 extern int g_f_enable_speed_control;
 extern int g_f_enable_pwm_control;	/* 启用开环速度控制标志位 */
 extern int g_pit_cnt;//电机控制时间间隔记数
-
-/*光编距离计数*/
-extern int dis_count;
-extern int g_f_dis_count_control;
-
 //转向
 extern int g_turn_start;
 extern int g_turn_state;
